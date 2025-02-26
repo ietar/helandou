@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页 -- 荷兰豆</title>
+    <link rel="stylesheet" href="/static/css/default.css">
+
+    <script type="text/javascript" src="/static/js/vue.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/static/js/axios0.24.0.js"></script>
+    <script type="text/javascript" src="/static/js/pre_common.js"></script>
+    <script type="text/javascript" src="/static/js/index.js"></script>
+</head>
+<body>
+    <div class="header clearfix">
+        <div class="container">
+            <div class="where_am_i">
+                <a href="/">首页</a>
+            </div>
+            <div class="search_bar" id="search_bar" v-cloak>
+                <form action="/search/" method="get">
+                    <input type="text" class="search_input" :placeholder="search_place_holder" name="q" autocomplete="off">
+                    <input type="submit" value="提交">
+                </form>
+            </div>
+            <div class="user_info" id="user_info_bar" v-cloak>
+                <div v-if="username">
+                    <a class="username" href="/user/profile">[[ username ]]</a>
+                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                </div>
+                <div v-else>
+                    <a id="register" href="/user/register">注册</a>
+                    <a id="login" href="/user/login">登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height:5rem"></div>
+    <div class="go_to_read">
+        <a href="/books">读书去</a>
+    </div>
+
+    <div class="sweets">
+        <form name="drawcards" id="drawcards" method="post" action="/drawcards/">
+            <!--<button type="button" onclick="f1()">试试手气</button>-->
+            <button type="button" onclick="f2()">试试手气</button>
+            <button type="button" onclick="f3()">一会再试</button>
+            <span id="draw_result"></span>
+            {% for i in ret %}
+                {{i.name}}
+            {% endfor %}
+        </form>
+        <iframe id="iframe1" src="" width="0" height ="0" frameborder="0" >您的浏览器不支持呀</iframe>
+        <p>目前共有 {{counts}} 位注册用户</p>
+    </div>
+    <div class="bei_an">
+        <img src="/static/gongan.png" alt="备案图标" class="inline">
+        <a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">京ICP备19036293号-1</a>
+    </div>
+
+    <script src="/static/js/common.js"></script>
+</body>
+</html>

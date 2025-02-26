@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <script type="text/javascript" src="/static/js/regist.js/"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/regist.css">
+</head>
+<body>
+    <form action ='/account/registed/' method="post" id="form1">
+        <p><label for='username'>用户名: <input type="text" name='username' id="username" autocomplete="off" placeholder="6-20位"
+                                             autofocus="autofocus" required maxlength="20" minlength="6" onblur="usercheck()"></label>
+            <span id="usercheckinfo" >请输入用户名</span></p>
+
+        <p><label for="password">输入密码: <input type="password" name='password' id="password" required minlength="6"
+                                              maxlength="20" placeholder="6-20位" autocomplete="off"></label></p>
+        <p><label for="repassword">重复密码: <input type="password" name='repassword' id="repassword" minlength="6"
+                                                required maxlength="20" placeholder="6-20位" onblur="pw_check()" autocomplete="off"></label></p>
+        <p><label for="email">邮箱(用于找回密码): <input type="email" name='email' id="email" required maxlength="30"
+                                                 placeholder="30位以内" onblur="emailcheck()"></label>
+            <span id="emailcheckinfo" >请输入邮箱</span></p>
+        <input type="submit" name='submit' id='submit' value="注册"> <input type="reset">
+    </form>
+    <p><a href="/account/login/">想起了账号 这就去登陆</a></p>
+</body>
+</html>

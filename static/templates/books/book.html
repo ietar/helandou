@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>目录 -- 荷兰豆</title>
+    <link rel="stylesheet" href="/static/css/default.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/book.css">
+
+    <script type="text/javascript" src="/static/js/vue.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/static/js/axios0.24.0.js"></script>
+    <script type="text/javascript" src="/static/js/pre_common.js"></script>
+    <script type="text/javascript" src="/static/js/index.js"></script>
+</head>
+<body>
+    <div class="header clearfix">
+        <div class="container">
+            <div class="where_am_i">
+                <a href="/">首页</a>
+            </div>
+            <div class="search_bar" id="search_bar" v-cloak>
+                <form action="/search/" method="get">
+                    <input type="text" class="search_input" :placeholder="search_place_holder" name="q" autocomplete="off">
+                    <input type="submit" value="提交">
+                </form>
+            </div>
+            <div class="user_info" id="user_info_bar" v-cloak>
+                <div v-if="username">
+                    <a class="username" href="/user/profile">[[ username ]]</a>
+                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                </div>
+                <div v-else>
+                    <a id="register" href="/user/register">注册</a>
+                    <a id="login" href="/user/login">登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header_bottom" id="book_view">
+        <div class="where_am_i">
+            <a href="/">首页</a><span class="arrow">--></span><a href="/books/">书籍总览</a><span class="arrow">--></span><a href="/book/{{book_id}}/">《{{book_name}}》</a>
+        </div>
+        {% if book_name %}
+            <div class="book_name"><h1>《{{book_name}}》</h1></div>
+            <div class="author">作者: {{author}}</div>
+            <div class="read_count">点击: {{read_count}}</div>
+            <div class="collect_count">收藏: {{collect_count}}</div>
+            <div class="digest">{{digest}}</div>
+            <dl class="chapter_top">
+                <dt>《{{book_name}}》章节目录:</dt>
+                {% for chapter in chapters %}
+                    <dd class="chapter" id={{loop.index}}><a href="/book/{{book_id}}/{{loop.index}}/">{{chapter}}</a></dd>
+                {% endfor %}
+            </dl>
+        {% else %}
+            <div>找不到该书</div>
+        {% endif %}
+
+    </div>
+
+    <div class="sweets">
+        <form name="drawcards" id="drawcards" method="post" action="/drawcards/">
+            <!--<button type="button" onclick="f1()">试试手气</button>-->
+            <button type="button" onclick="f2()">试试手气</button>
+            <button type="button" onclick="f3()">一会再试</button>
+            <span id="draw_result"></span>
+            {% for i in ret %}
+                {{i.name}}
+            {% endfor %}
+        </form>
+        <iframe id="iframe1" src="" width="0" height ="0" frameborder="0" >您的浏览器不支持呀</iframe>
+    </div>
+    <div class="bei_an">
+        <p>
+    <!--            <img src="https://csdnimg.cn/pubfooter/images/gongan.png" alt="备案图标">-->
+            <br><br><br><a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">京ICP备19036293号-1</a>
+        </p>
+    </div>
+
+    <script type="text/javascript" src="/static/js/book.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+</body>
+</html>

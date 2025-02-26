@@ -1,0 +1,9 @@
+aerich init -t settings.setting1
+aerich init-db
+aerich migrate
+aerich upgrade
+
+ALTER TABLE USER AUTO_INCREMENT = 1;
+
+C:\Program Files\OpenSSL-Win64\bin  (已加入path)
+openssl rand -hex 32

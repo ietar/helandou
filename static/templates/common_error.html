@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error Page -- 胡萝呗</title>
+    <link rel="stylesheet" href="/static/css/default.css">
+
+    <script type="text/javascript" src="/static/js/vue.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/static/js/axios0.24.0.js"></script>
+    <script type="text/javascript" src="/static/js/pre_common.js"></script>
+</head>
+<body>
+    <div class="header clearfix">
+        <div class="container">
+            <div class="where_am_i">
+                <a href="/">首页</a> >> <a href={{ url('account:register') }}>错误页面</a>
+            </div>
+            <div class="search_bar" id="search_bar" v-cloak>
+                <form action="/search/" method="get">
+                    <input type="text" class="search_input" :placeholder="search_place_holder" name="q" autocomplete="off">
+                    <input type="submit" value="提交">
+                </form>
+            </div>
+            <div class="user_info" id="user_info_bar" v-cloak>
+                <div v-if="username">
+                    <a class="username" href={{ url('account:profile') }}>[[ username ]]</a>
+                    <a id="logout" href={{ url('account:logout') }}>退出</a>
+                </div>
+                <div v-else>
+                    <a id="register" href={{ url('account:register') }}>注册</a>
+                    <a id="login" href={{ url('account:login') }}>登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header_bottom">
+        {{ csrf_input }}
+        <div class="error_info">
+            <h2>{{ error_info }}</h2>
+            <a href="{{ return_page }}"> {{ return_text }}</a>
+        </div>
+    </div>
+    <script src="/static/js/common.js"></script>
+{#    <script src="/static/js/register.js"></script>#}
+{#    <script src="{{ static('js/register.js') }}"></script>#}
+</body>
+</html>

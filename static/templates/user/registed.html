@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <title>注册结果</title>
+    {% if result == 'ok' %}<meta http-equiv="refresh" content="3;URL=/account/index/">{% endif %}
+</head>
+<body>
+    {% if result == 'ok' %}
+        <h1>注册成功啦</h1>
+        <p>3秒后前往首页</p>
+    {% else %}
+        <h1>用户名重复 麻烦回去重新注册=。=</h1>
+        <a href="/account/regist/"><p>>返回注册</p></a>
+    {% endif %}
+</body>
+</html>

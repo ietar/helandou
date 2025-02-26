@@ -1,0 +1,2 @@
+0: 图片验证码 k-v  img_code_{uuid}: captcha
+1: 限流记录 k-v  ip__path: last_access_time  设定ttl

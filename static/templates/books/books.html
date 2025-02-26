@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>书籍总览 -- 荷兰豆</title>
+    <link rel="stylesheet" href="/static/css/default.css">
+    <link rel="stylesheet" href="/static/css/book.css">
+
+    <script type="text/javascript" src="/static/js/vue.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/static/js/axios0.24.0.js"></script>
+    <script type="text/javascript" src="/static/js/pre_common.js"></script>
+    <script type="text/javascript" src="/static/js/index.js"></script>
+</head>
+<body>
+    <div class="header clearfix">
+        <div class="container">
+            <div class="where_am_i">
+                <a href="/">首页</a>
+            </div>
+            <div class="search_bar" id="search_bar" v-cloak>
+                <form action="/search/" method="get">
+                    <input type="text" class="search_input" :placeholder="search_place_holder" name="q" autocomplete="off">
+                    <input type="submit" value="提交">
+                </form>
+            </div>
+            <div class="user_info" id="user_info_bar" v-cloak>
+                <div v-if="username">
+                    <a class="username" href="/user/profile">[[ username ]]</a>
+                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                </div>
+                <div v-else>
+                    <a id="register" href="/user/register">注册</a>
+                    <a id="login" href="/user/login">登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main header_bottom flex_column" id="books">
+        <div class="where_am_i">
+            <a href="/">首页</a><span class="arrow">--></span><a href="/books/">书籍总览</a>
+        </div>
+        <div class="books">
+
+        <dl>
+            <dd v-for="book in books" class="single_book">
+                <a :href=`/books/${book.id}/` class="book-link">
+                  《[[ book.book_name ]]》
+                </a>
+            </dd>
+        </dl>
+        </div>
+
+        <div class="collections" id="collections">
+            <dl>
+                <dt>我的收藏夹:</dt>
+                    <dd v-for = "col in collections" class="single_collection">
+                        <a :href="`/books/${col.book_id}/${col.chapter_order}`">《[[col.book_name]]》  [[col.chapter]]</a>
+                        <a href="#" @click.prevent="delete_collection(col.content_id)">移出收藏夹</a>
+
+            </dl>
+        </div>
+
+    </div>
+
+    <div class="bei_an">
+        <p>
+            <br><br><br><a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">京ICP备19036293号-1</a>
+        </p>
+    </div>
+
+    <script type="text/javascript" src="/static/js/books.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+</body>
+</html>

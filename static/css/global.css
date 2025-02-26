@@ -1,0 +1,11 @@
+body{
+    background-color: #E9FAFF;
+}
+.user_tab{
+    display:inline-flex;
+    position:absolute;
+    right:0;
+    align-items:center;
+    justify-content: center;
+    width:auto;
+}

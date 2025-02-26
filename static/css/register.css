@@ -1,0 +1,39 @@
+[v-cloak]{
+	display: none;
+}
+.pic_code{
+	width: auto;
+	height: auto;
+}
+div.inner-center>*{
+	align-self: center;
+	margin-right: 1rem;
+}
+form.register_form{
+	border: yellowgreen solid 1px;
+	width: 40%;
+	display:flex;
+	align-items: center;
+	justify-content:center;
+}
+form.register_form>ul{
+	width:90%;
+	margin:0;
+	padding:1rem 0;
+}
+.register_form>ul>li{
+	height: 3rem;
+	border: #4ac1f7 solid 1px;
+	display: flex;
+	align-items:center;
+	justify-content: left;
+}
+.register_form>ul>li>*{
+	margin-right: 1rem;
+	margin-left: 1rem;
+}
+div#app{
+	justify-content:center;
+	display: flex;
+	align-items:center;
+}

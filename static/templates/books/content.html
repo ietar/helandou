@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>正文页 -- 荷兰豆</title>
+    <link rel="stylesheet" href="/static/css/default.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/book.css">
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/vue.min.js"></script>
+    <script type="text/javascript" src="/static/js/axios0.24.0.js"></script>
+    <script type="text/javascript" src="/static/js/index.js"></script>
+    <script type="text/javascript" src="/static/js/user_collections.js/"></script>
+    <script type="text/javascript" src="/static/js/pre_common.js"></script>
+</head>
+<body>
+    <div class="header clearfix">
+        <div class="container">
+            <div class="where_am_i">
+                <a href="/">首页</a>
+            </div>
+            <div class="search_bar" id="search_bar" v-cloak>
+                <form action="/search/" method="get">
+                    <input type="text" class="search_input" :placeholder="search_place_holder" name="q" autocomplete="off">
+                    <input type="submit" value="提交">
+                </form>
+            </div>
+            <div class="user_info" id="user_info_bar" v-cloak>
+                <div v-if="username">
+                    <a class="username" href="/user/profile">[[ username ]]</a>
+                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                </div>
+                <div v-else>
+                    <a id="register" href="/user/register">注册</a>
+                    <a id="login" href="/user/login">登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="blank"></div>
+    <div class="book_main">
+        <div class="where_am_i">
+            <a href="/">首页</a>
+            <span class="arrow">--></span>
+            <a href="/books/">书籍总览</a>
+            <span class="arrow">--></span>
+            <a href="/book/{{book_id}}/">《{{book_name}}》</a>
+            <span class="arrow">--></span><span>{{chapter}}</span>
+        </div>
+        <div class="content_wrapper">
+            {% if content %}
+            <div class="book_content_info">
+                <div class="book_name"><h1>《{{book_name}}》</h1></div>
+                <div class="chapter"><h2>{{chapter}}</h2></div>
+                <div class="read_count">点击: {{read_count}}</div>
+                <div class="collect_count">收藏: {{collect_count}}</div>
+            </div>
+
+            <div class="content">{{content}}</div>
+            {% else %}
+                <div>找不到该章节</div>
+                <script>document.title="找不到该章节";</script>
+            {% endif %}
+
+            <div class="content_footer">
+                <a href="/book/{{book_id}}/{{chapter_count - 1}}">前一章</a>
+                <a href="/book/{{book_id}}">回目录</a>
+                <a href="/book/{{book_id}}/{{chapter_count + 1}}">后一章</a>
+                <a href="javascript:void(0);" onclick=add_collections('{{username}}')>收藏 </a>
+                {# todo #}
+            </div>
+        </div>
+        <div class="comment_wrapper">
+            <h3 class="comment_top">评论区</h3>
+            <div class="comments">
+                {% for comment in comments %}
+                    <div class="comment" id="{{comment.id}}">
+                        <div class="comment_user_name">{{comment.user_name}}</div>
+                        <div class="comment_comment">{{comment.comment}}</div>
+                        <span class="comment_ts">评论时间: {{comment.ts}}</span>
+
+                        <span class="agree_span">
+                            {#todo#}
+                            <a href="javascript:void(0)" class="agree" onclick="console.log('{{comment.id}}')">赞个</a>
+                            <span class="comment_agree">{{comment.agree}}</span>
+                            <a href="javascript:void(0)" class="disagree" onclick="console.log('{{comment.id}}')">反对</a>
+                        </span>
+
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="add_comment">
+                <div>
+                    <label>
+                    <textarea id="input_comment" cols="30" rows="4"></textarea>
+                </label>
+                </div>
+                <div>
+                    <span>署名:</span>
+                    <input type="text" id="input_comment_user_name" placeholder="{{username}}">
+                    <a href="javascript:void(0)" class="add_comment" onclick="add_comment('{{book_id}}', '{{chapter_count}}');">提交</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sweets">
+        <form name="drawcards" id="drawcards" method="post" action="/drawcards/">
+            <!--<button type="button" onclick="f1()">试试手气</button>-->
+            <button type="button" onclick="f2()">试试手气</button>
+            <button type="button" onclick="f3()">一会再试</button>
+            <span id="draw_result"></span>
+            {% for i in ret %}
+                {{i.name}}
+            {% endfor %}
+        </form>
+        <iframe id="iframe1" src="" width="0" height ="0" frameborder="0" >您的浏览器不支持呀</iframe>
+    </div>
+    <div class="bei_an">
+        <p>
+    <!--            <img src="https://csdnimg.cn/pubfooter/images/gongan.png" alt="备案图标">-->
+            <br><br><br><a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">京ICP备19036293号-1</a>
+        </p>
+    </div>
+
+    <script type="text/javascript" src="/static/js/common.js"></script>
+</body>
+</html>

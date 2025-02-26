@@ -1,0 +1,93 @@
+div.blank{
+    height: 3rem;
+}
+div.book_main {
+    margin: 0 10rem;
+    border: 2px solid #88C6E5;
+}
+dd.chapter{
+    margin: 1rem 1rem;
+    width: 30%;
+    font-size: 1.5rem;
+    text-align: left;
+    text-indent: 1rem;
+    display: inline-block;
+    border-bottom: 1px dashed #CCC;
+}
+dd.single_book{
+    margin: 2rem 1rem;
+    width: 30%;
+    font-size: 1.5rem;
+    text-align: left;
+    text-indent: 1rem;
+    display: inline-block;
+}
+div.book_name, div.chapter{
+    text-align: center;
+}
+div.content_footer>a{
+    display: inline-flex;
+    margin:0 3rem;
+}
+div.content_footer>span{
+    display: inline-flex;
+    margin:0 3rem;
+}
+div.content_footer{
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+div.content_wrapper{
+    justify-content: center;
+    align-items: center;
+}
+div.content_wrapper>div{
+    padding:1rem 0;
+    border: 1px solid #88C6E5;
+}
+span.arrow{
+    margin:0 1rem;
+}
+
+dl.chapter_top{
+    text-align: left;
+}
+dl.chapter_top>dt{
+    text-align: center;
+    margin-bottom: 1rem;
+    background: #C3DFEA;
+    font-size: 2rem;
+}
+div.books{
+    margin-top:2rem;
+}
+div.where_am_i{
+    text-indent:1rem;
+}
+div.content{
+    font-size: 1.2rem;
+    letter-spacing: 0.2rem;
+    line-height: 150%;
+}
+textarea.input_comment{
+    border: 1px solid #e0c19e;
+    border-radius: 0.1rem;
+}
+
+a.agree, a.disagree{
+    display: inline;
+}
+
+h3.comment_top{
+    text-align: left;
+}
+div.comment{
+    border:1px solid #7A9FE0;
+    margin-top: 0.5rem;
+    width:40%
+}
+span.comment_ts, span.agree_span, div.comment_user_name{
+    font-size: 0.5rem;
+}

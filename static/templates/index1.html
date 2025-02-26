@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index1</title>
+    <script type="text/javascript" src="/static/js/index1_ajax.js/"></script>
+</head>
+<body>
+<div>
+    <input type="text" value="123">
+    <input type="password" value="1234">
+    <input type="radio">男
+    <input type="checkbox">选项1
+    <input type="checkbox">选项2
+</div>
+<div>
+    <form action="" method="post" id="form1">
+        <input type="text" name="askname">
+        <!--input type="submit"-->
+        <button type='button' onclick="func1()">点我提交</button>
+    </form>
+</div>
+{% if asked == 'yes' %}
+    {% if username %}
+        <p>用户名: {{username}}</p>
+        <p>邮箱:{{email}}</p>
+    {% else %}
+        <p>查无此人</p>
+    {% endif %}
+{% endif %}
+<p id="d1"><br><br>hehe {{username}}</p>
+<p id="d2">hehe2 {{email}}</p>
+</body>
+</html>

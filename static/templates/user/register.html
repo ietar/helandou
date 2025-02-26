@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册 -- 荷兰豆</title>
+    <link rel="stylesheet" href="/static/css/register.css">
+    <link rel="stylesheet" href="/static/css/default.css">
+
+    <script type="text/javascript" src="/static/js/vue.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/static/js/axios0.24.0.js"></script>
+    <script type="text/javascript" src="/static/js/pre_common.js"></script>
+
+</head>
+<body>
+    <div class="header clearfix">
+        <div class="container">
+            <div class="where_am_i">
+                <a href="/">首页</a>
+            </div>
+            <div class="search_bar" id="search_bar" v-cloak>
+                <form action="/search/" method="get">
+                    <input type="text" class="search_input" :placeholder="search_place_holder" name="q" autocomplete="off">
+                    <input type="submit" value="提交">
+                </form>
+            </div>
+            <div class="user_info" id="user_info_bar" v-cloak>
+                <div v-if="username">
+                    <a class="username" href="/user/profile">[[ username ]]</a>
+                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                </div>
+                <div v-else>
+                    <a id="register" href="/user/register">注册</a>
+                    <a id="login" href="/user/login">登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header_bottom">
+        <div id="app">
+            <form method="post" class="register_form" @submit="on_submit" v-cloak>
+                <input type="hidden" id="uuid" name="uuid">
+                <ul>
+                    <li>
+                        <label for="user_name">用户名</label>
+                        <input type="text" name="username" id="user_name" autocomplete="off" v-model="username"
+                               @blur="check_username" placeholder="用户名">
+                        <span class="error_tip" v-show="error_name" id="error_name_message">[[ error_name_message ]]</span>
+                        <span class="error_free_tip" v-show="correct_name" id="correct_name_message">√ 用户名可用</span>
+                    </li>
+                    <li>
+                        <label for="pwd">密码</label>
+                        <input type="password" name="password" id="pwd" autocomplete="off" v-model="password"
+                               @blur="check_password" placeholder="密码">
+                        <span class="error_tip" v-show="error_password">请输入8-20位的密码</span>
+                    </li>
+                    <li>
+                        <label for="cpwd">确认密码</label>
+                        <input type="password" name="password2" id="cpwd" v-model="password2" @blur="check_password2"
+                               placeholder="确认密码">
+                        <span class="error_tip" v-show="error_password2">两次输入的密码不一致</span>
+                    </li>
+                    <li>
+                        <label for="email">邮箱</label>
+                        <input type="text" name="email" id="email" v-model="email" @blur="check_email" placeholder="邮箱">
+                        <span class="error_tip" v-show="error_email">[[ error_email_message ]]</span>
+                    </li>
+                    <li>
+                        <label for="mobile">手机</label>
+                        <input type="text" name="mobile" id="mobile" v-model="mobile" @blur="check_mobile"
+                               placeholder="手机">
+                        <span class="error_tip" v-show="error_mobile">[[ error_mobile_message ]]</span>
+                    </li>
+                    <li>
+                        <label for="pic_code">图形验证码</label>
+                        <input type="text" name="img_code" id="pic_code" class="msg_input" placeholder="图形验证码"
+                               v-model="img_code" @blur="check_img_code">
+                        <img :src="image_code_url" alt="图形验证码" class="pic_code" @click="generate_image_code">
+                        <span class="error_tip" v-show="error_img_code">[[ error_img_message ]]</span>
+                    </li>
+                    <li>
+                        <label for="email_code">邮件验证码</label>
+                        <input type="text" name="email_code" id="email_code" placeholder="邮箱验证码" v-model="email_code">
+                        <span class="send_email_code blue_white_button" @click="send_email_code">发送邮件验证码</span>
+                        <span class="error_tip" v-show="error_email_code">[[ error_email_code_message ]]</span>
+                        <!--                </li>-->
+                        <!--                <li id="email_code_error_status_code_rel" style="display:none">-->
+                        <!--                </li>-->
+                    <li class="agreement">
+                        <input type="checkbox" name="allow" id="allow" v-model="allow" @change="check_allow">
+                        <label for="allow">同意xxx协议</label>
+                        <span class="error_tip" v-show="error_allow">请勾选xxx协议</span>
+                        <span class="error_tip" v-show="error_register">[[ error_register_message ]]</span>
+                    </li>
+                    <li class="reg_sub">
+                        <input type="submit" value="注册" class="blue_white_button">
+                    </li>
+                    <li v-if="show_success" class="success-tip">
+                        <span class="success-icon">✓</span>
+                        <span class="success-text">[[ success_message ]]</span>
+                        <div class="manual-jump">
+                            不想等待？<a href="/user/login" class="jump-link">立即跳转</a>
+                        </div>
+                    </li>
+
+                </ul>
+            </form>
+        </div>
+    </div>
+    <script src="/static/js/register.js"></script>
+    <script src="/static/js/common.js"></script>
+</body>
+</html>
