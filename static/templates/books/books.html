@@ -15,7 +15,7 @@
 <body>
     <div class="header clearfix">
         <div class="container">
-            <div class="where_am_i">
+            <div class="where_am_i2">
                 <a href="/">首页</a>
             </div>
             <div class="search_bar" id="search_bar" v-cloak>
@@ -37,7 +37,7 @@
         </div>
     </div>
     <div class="main header_bottom flex_column" id="books">
-        <div class="where_am_i">
+        <div class="where_am_i2">
             <a href="/">首页</a><span class="arrow">--></span><a href="/books/">书籍总览</a>
         </div>
         <div class="books">
@@ -55,10 +55,18 @@
             <dl>
                 <dt>我的收藏夹:</dt>
                     <dd v-for = "col in collections" class="single_collection">
-                        <a :href="`/books/${col.book_id}/${col.chapter_order}`">《[[col.book_name]]》  [[col.chapter]]</a>
+                        <a :href="`/books/${col.book_id}/${col.chapter_order}`">《[[col.book_name]]》 第[[col.chapter_order]]章 [[col.chapter]]</a>
                         <a href="#" @click.prevent="delete_collection(col.content_id)">移出收藏夹</a>
-
             </dl>
+        </div>
+        <div style="width: 6rem">
+            <span style="margin: 0.5rem">
+                <a href="/books/create_book/" class="blue_white_button">创建书籍</a>
+            </span>
+            <span>
+                <a href="/books/create_content/" class="blue_white_button">创建章节</a>
+            </span>
+
         </div>
 
     </div>

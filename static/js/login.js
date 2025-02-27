@@ -72,7 +72,7 @@ let vm = new Vue({
                 let searchParams = new URLSearchParams(window.location.search);
                 let from = searchParams.get('from');
                 from = from?from:"/";
-                console.log(from);
+//                console.log(from);
 
                 e.preventDefault();
                 let url = `/api/user/login`;

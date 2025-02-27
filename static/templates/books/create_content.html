@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>目录 -- 荷兰豆</title>
+    <title>创建章节 -- 荷兰豆</title>
     <link rel="stylesheet" href="/static/css/default.css">
-    <link rel="stylesheet" href="/static/css/index.css">
     <link rel="stylesheet" href="/static/css/book.css">
 
     <script type="text/javascript" src="/static/js/vue.min.js"></script>
@@ -37,26 +36,43 @@
             </div>
         </div>
     </div>
-    <div class="header_bottom" id="book_view">
+    <div class="main header_bottom flex_column" id="books">
         <div class="where_am_i2">
-            <a href="/">首页</a><span class="arrow">--></span><a href="/books/">书籍总览</a><span class="arrow">--></span><a :href=`/books/${book_id}`>《{{book.book_name}}》</a>
+            <a href="/">首页</a><span class="arrow">--></span><a href="/books/create_content/">创建章节</a>
         </div>
-            <div v-if="book">
-                <div class="book_name"><h1>《{{book.book_name}}》</h1></div>
-                <div class="author">作者: {{book.author}}</div>
-                <div class="read_count">点击: {{book.read_count}}</div>
-                <div class="collect_count">收藏: {{book.collect_count}}</div>
-                <div class="digest">简介： {{book.digest}}</div>
-                <dl class="chapter_top">
-                    <dt>《{{book.book_name}}》章节目录:</dt>
-                        <dd v-for="chapter in chapters" class="chapter"><a :href=`/books/${book.id}/${chapter.chapter_order}/`>
-                            第{{chapter.chapter_order}}章 {{chapter.chapter}}
-                        </a></dd>
+
+        <div id="create_content">
+            <div id="my_books">
+                <h1>选择要追加内容的书籍</h1>
+                <dl>
+                    <dd v-for="book in books" class="single_book" @click="select_book(book.id)">
+                        <input type="radio" name="choose_book">
+                        <a :href=`/books/${book.id}/` class="book-link">
+                          《{{ book.book_name }}》
+                        </a>
+                    </dd>
                 </dl>
             </div>
-            <div>
-                <div v-if="!book" >{{error_msg}}</div>
+
+            <div style="margin:1rem">
+                <input type="text" name="chapter_order" autocomplete="off" placeholder="章节号(数字 不重复)" v-model="chapter_order">
             </div>
+            <div style="margin:1rem">
+                <input type="text" name="chapter" autocomplete="off" placeholder="章节名" v-model="chapter">
+            </div>
+            <div style="margin:1rem">
+                <textarea id="input_comment" cols="30" rows="4" v-model="content" placeholder="内容"></textarea>
+            </div>
+            <div style="margin:1rem">
+                <input type="submit" name="提交" @click.prevent="commit()">
+            </div>
+            <div style="margin:1rem">
+                <span v-show="msg" class="error_free_tip">{{ msg }}</span>
+            </div>
+            <div style="margin:1rem">
+                <span v-show="error" class="error_tip">{{ error }}</span>
+            </div>
+        </div>
 
     </div>
 
@@ -66,7 +82,7 @@
         </p>
     </div>
 
-    <script type="text/javascript" src="/static/js/book.js"></script>
+    <script type="text/javascript" src="/static/js/create.js"></script>
     <script type="text/javascript" src="/static/js/common.js"></script>
 </body>
 </html>

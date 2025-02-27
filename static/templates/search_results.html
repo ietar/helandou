@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>首页 -- 荷兰豆</title>
+    <title>搜索结果 -- 荷兰豆</title>
     <link rel="stylesheet" href="/static/css/default.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/book.css">
 
     <script type="text/javascript" src="/static/js/vue.min.js"></script>
     <script type="text/javascript" src="/static/js/jquery-3.4.1.js"></script>
@@ -35,22 +37,38 @@
             </div>
         </div>
     </div>
+    <div class="header_bottom" id="search_result">
+        <div class="where_am_i2">
+            <a href="/">首页</a><span class="arrow">--></span><span>搜索结果</span>
+        </div>
+        <div>
+            <div v-for="book in books" class="result">
+                <div class=><h1><a :href=`/books/${book.id}/`>《{{book.book_name}}》</a></h1></div>
+                <div class="author">作者: {{book.author}}</div>
+                <div class="read_count">点击: {{book.read_count}}</div>
+                <div class="collect_count">收藏: {{book.collect_count}}</div>
+                <div class="digest">简介： {{book.digest}}</div>
+<!--                <dl class="chapter_top">-->
+<!--                    <dt>《{{book.book_name}}》章节目录:</dt>-->
+<!--                        <dd v-for="chapter in chapters" class="chapter"><a :href=`/books/${book.id}/${chapter.chapter_order}/`>{{chapter.chapter}}</a></dd>-->
+<!--                </dl>-->
+            </div>
+            <div>
+                <h2>共找到 {{count}} 条结果</h2>
+                <div v-if="!books" >{{error}}</div>
+            </div>
+        </div>
 
-    <div style="height:5rem"></div>
-    <div class="go_to_read">
-        <a href="/books">读书去</a>
-    </div>
-    <div id="greetings">
-        <p>目前共有 {{ counts }} 位注册用户</p>
-        <p>欢迎新用户 {{ latest }}</p>
+
     </div>
 
     <div class="bei_an">
-        <img src="/static/gongan.png" alt="备案图标" class="inline">
-        <a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">京ICP备19036293号-1</a>
+        <p>
+            <br><br><br><a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">京ICP备19036293号-1</a>
+        </p>
     </div>
 
-    <script src="/static/js/common.js"></script>
-    <script src="/static/js/greetings.js"></script>
+    <script type="text/javascript" src="/static/js/search_result.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
 </body>
 </html>

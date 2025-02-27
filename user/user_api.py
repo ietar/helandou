@@ -22,6 +22,17 @@ from auth import create_user_token, get_user_token, USER_TOKEN_EXPIRE_MINUTES
 user_api_router = APIRouter()
 
 
+@user_api_router.get("/greet")
+async def greet():
+    counts = await User.filter(deleted=False).count()
+    latest = await User.filter(deleted=False).order_by("create_time").last()
+    result = {
+        "counts": counts,
+        "latest": latest.username
+    }
+    return wrap_response(result)
+
+
 @user_api_router.post("/send_reset_email")
 async def send_reset_email(request: Request, username: str = Form()):
     ip = request.client.host
@@ -223,7 +234,8 @@ async def register(register_user: RegisterUserIn, response: Response):
     temp["_password"] = sha256((pwd + salt).encode("utf-8")).hexdigest()
 
     new_user = User(**temp)
-    new_user.level = LevelEnum.unvalidated
+    # new_user.level = LevelEnum.unvalidated
+    new_user.level = LevelEnum.normal  # 认证再说吧
     new_user._salt = salt
     await new_user.save()
     return public_wrap_response(new_user)
@@ -357,3 +369,4 @@ async def put_userinfo(body: PutUserIn):
         return public_wrap_response(user)
     else:
         return r401()
+

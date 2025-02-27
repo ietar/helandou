@@ -23,7 +23,7 @@ class BookContent(ModelA, LogicalDeleteMixin):
     书籍正文
     """
     book = fields.ForeignKeyField(model_name="models.Book", related_name="contents")  # 所属书籍
-    chapter_order = fields.IntField(description="章节数", index=True)
+    chapter_order = fields.IntField(description="章节数", index=True, unique=True)
     chapter = fields.CharField(max_length=64, description="章节名")
     content = fields.TextField(description="正文内容")
     collect_count = fields.IntField(default=0, description="收藏数")

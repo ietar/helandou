@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>首页 -- 荷兰豆</title>
+    <title>创建书籍 -- 荷兰豆</title>
     <link rel="stylesheet" href="/static/css/default.css">
+    <link rel="stylesheet" href="/static/css/book.css">
 
     <script type="text/javascript" src="/static/js/vue.min.js"></script>
     <script type="text/javascript" src="/static/js/jquery-3.4.1.js"></script>
@@ -35,22 +36,37 @@
             </div>
         </div>
     </div>
+    <div class="main header_bottom flex_column">
+        <div class="where_am_i2">
+            <a href="/">首页</a><span class="arrow">--></span><a href="/books/create_book/">创建书籍</a>
+        </div>
+        <div id="create_book">
+            <div style="margin:1rem">
+                <input type="text" name="book_name" autocomplete="off" placeholder="书名" v-model="book_name">
+            </div>
+            <div style="margin:1rem">
+                <textarea id="input_comment" cols="30" rows="4" v-model="digest" placeholder="简介"></textarea>
+            </div>
+            <div style="margin:1rem">
+                <input type="submit" name="提交" @click.prevent="commit()">
+            </div>
+            <div style="margin:1rem">
+                <span v-show="msg" class="error_free_tip">{{ msg }}</span>
+            </div>
+            <div style="margin:1rem">
+                <span v-show="error" class="error_tip">{{ error }}</span>
+            </div>
+        </div>
 
-    <div style="height:5rem"></div>
-    <div class="go_to_read">
-        <a href="/books">读书去</a>
-    </div>
-    <div id="greetings">
-        <p>目前共有 {{ counts }} 位注册用户</p>
-        <p>欢迎新用户 {{ latest }}</p>
     </div>
 
     <div class="bei_an">
-        <img src="/static/gongan.png" alt="备案图标" class="inline">
-        <a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">京ICP备19036293号-1</a>
+        <p>
+            <br><br><br><a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">京ICP备19036293号-1</a>
+        </p>
     </div>
 
-    <script src="/static/js/common.js"></script>
-    <script src="/static/js/greetings.js"></script>
+    <script type="text/javascript" src="/static/js/create.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
 </body>
 </html>

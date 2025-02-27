@@ -138,8 +138,12 @@ async def server_status(response: Response, ietar: Optional[str]):
 
 @app.get('/')
 async def root(request: Request):
-    print(request.cookies)
     return FileResponse("static/templates/index.html")
+
+
+@app.get('/search')
+async def search(request: Request):
+    return FileResponse("static/templates/search_results.html")
 
 
 @app.websocket("/ws")

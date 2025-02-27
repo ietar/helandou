@@ -1,15 +1,15 @@
 let ap_books = new Vue({
     el: '#book_view',
-    delimiters: ['[[', ']]'],
+//    delimiters: ['[[', ']]'],
     data:{
-        books: [],
-        collections: [],
-        auth: '',
+        book: '',
+        book_id: '',
+        chapters: [],
+        error_msg: '找不到该书',
     },
     mounted(){
-        this.get_auth();
-        this.get_books()
-        this.get_my_collections()
+        this.get_auth(),
+        this.get_book()
     },
     methods:{
         get_auth(){
@@ -19,31 +19,26 @@ let ap_books = new Vue({
                 }
             this.auth = getAuthByRegex();
         },
-        get_books(){
-            axios.get('/api/books/',{params:{},headers:{}, responseType: 'json'})
+        get_book(){
+            let u = window.location.href;
+            const match = u.match(/\/(\d+)\/?$/);
+            this.book_id = match ? parseInt(match[1], 10) : null;
+            axios.get(`/api/books/${this.book_id}`,{params:{},headers:{}, responseType: 'json'})
             .then(res => {
                 if (res.data.success) {
-                        this.books = res.data.data;
+                        this.book = res.data.data;
                     } else {
-                        this.error = '数据加载失败：' + (res.data.msg || '未知错误')
+                        this.error_msg = '数据加载失败：' + (res.data.msg || '未知错误')
+                    }
+            }).catch(e => {console.log(e)})
+            axios.get(`/api/content/get_all_chapters/${this.book_id}`,{params:{},headers:{}, responseType: 'json'})
+            .then(res => {
+                if (res.data.success) {
+                        this.chapters = res.data.data;
+                    } else {
+                        this.error_msg = '数据加载失败：' + (res.data.msg || '未知错误')
                     }
             }).catch(e => {console.log(e)})
         },
-        delete_collection(content_id){
-            axios.post('/api/content/add_to_collection', {"content_id": content_id}, {headers:{'Authorization': this.auth}, responseType: 'json'})
-            .then(res => {
-                if (res.data.success){
-                    window.location.reload();
-                }
-            })
-        },
-        get_my_collections(){
-            axios.get('/api/content/my_collections', {headers:{'Authorization': this.auth}, responseType: 'json'})
-            .then(res => {
-                if (res.data.success) {
-                    this.collections = res.data.data;
-//                    console.log(this.collections);
-                }
-            }).catch(e => {console.log(e)})
-        },
+
 }});

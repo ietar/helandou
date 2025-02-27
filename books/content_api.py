@@ -57,7 +57,7 @@ async def create_content(book_id: int, body: CreateContentIn, token: dict = Depe
     new_content = BookContent(**body.model_dump())
     new_content.book = book
     await new_content.save()
-    return public_wrap_response(new_content)
+    return public_wrap_response(new_content, msg="创建章节成功")
 
 
 @content_api.get("/{book_id}/{chapter_order}")
@@ -74,7 +74,10 @@ async def single_content(book_id: int, chapter_order: int):
         return r404(msg="没有该章节")
     content.read_count += 1
     await content.save()
-    return public_wrap_response(content)
+    res = public_wrap_response(content)
+    res["data"]["book_id"] = book1.id
+    res["data"]["book_name"] = book1.book_name
+    return res
 
 
 @content_api.delete("/{book_id}/{chapter_order}")
@@ -130,9 +133,13 @@ async def add_to_collection(content_id: int = Body(embed=True), user=Depends(get
         return r404(msg="没有该章节")
     record = await Collection.get_or_none(user=user, content=content)
     if record:
+        content.collect_count -= 1
+        await content.save()
         await record.delete()
         return wrap_response(msg="取消收藏成功")
     else:
+        content.collect_count += 1
+        await content.save()
         new_collection = await Collection.create(user=user, content=content)
         return public_wrap_response(new_collection, msg="收藏成功")
 

@@ -8,6 +8,7 @@ from settings import custom
 
 comment_api = APIRouter()
 
+
 # 不好restful命名了 直接rpc
 
 
@@ -23,8 +24,18 @@ async def all_comment(book_id: int, chapter_order: int):
     if not content:
         return r404(msg="没有该章节")
 
-    results = await Comment.filter(book_content=content).order_by("create_time")
-    return public_wrap_response(model=results)
+    comments = await Comment.filter(book_content=content).select_related("author").order_by("create_time")
+    res = []
+    for comment in comments:
+        temp = {
+            "user_name": comment.author.username,
+            "content": comment.content,
+            "agree_count": comment.agree_count,
+            "id": comment.id,
+            "create_time": comment.create_time,
+        }
+        res.append(temp)
+    return wrap_response(res)
 
 
 class PutCommentIn(BaseModel):
@@ -37,7 +48,8 @@ class CreateCommentIn(BaseModel):
 
 
 @comment_api.post("/create_comment/{book_id}/{chapter_order}")
-async def create_comment(book_id: int, chapter_order: int, body: CreateCommentIn, token: dict = Depends(get_user_token)):
+async def create_comment(book_id: int, chapter_order: int, body: CreateCommentIn,
+                         token: dict = Depends(get_user_token)):
     """
     发表评论
     """
@@ -112,9 +124,13 @@ async def agree_comment(comment_id: int, user=Depends(get_user_from_jwt)):
     if record:
         await record.delete()
         await record.save()
+        comment.agree_count -= 1
+        await comment.save()
         return wrap_response(msg="取消点赞成功")
     else:
         new_record = await CommentAgree.create(user=user, comment=comment)
+        comment.agree_count += 1
+        await comment.save()
         return public_wrap_response(model=new_record, msg="点赞成功")
 
 
@@ -140,5 +156,3 @@ async def put_comment(book_id: int, chapter_order: int, body: PutCommentIn, toke
     #     return public_wrap_response(msg="已成功修改章节", model=content)
     # else:
     #     return r401(msg="只有管理员或作者本人有权修改该章节")
-
-

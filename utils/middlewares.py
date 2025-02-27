@@ -9,7 +9,7 @@ from settings import throttling_table
 from utils.response import r429
 from utils.connections import get_redis_connection
 
-DEFAULT_THROTTLING_SECONDS = 5
+DEFAULT_THROTTLING_SECONDS = 1
 
 
 class ThrottlingMiddleware(BaseHTTPMiddleware):

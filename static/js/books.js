@@ -33,7 +33,8 @@ let ap_books = new Vue({
             axios.post('/api/content/add_to_collection', {"content_id": content_id}, {headers:{'Authorization': this.auth}, responseType: 'json'})
             .then(res => {
                 if (res.data.success){
-                    window.location.reload();
+//                    window.location.reload();
+                    this.get_my_collections();
                 }
             })
         },

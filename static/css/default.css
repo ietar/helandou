@@ -184,6 +184,14 @@ a{
 	position: absolute;
 	left: 0;
 }
+
+.where_am_i2{
+	padding:0 1rem;
+	height: 2rem;
+	align-items: center;
+	display: flex;
+	left: 0;
+}
 .where_am_i>a{
 	padding:0 1rem;
 }
