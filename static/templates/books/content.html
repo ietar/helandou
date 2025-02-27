@@ -49,7 +49,7 @@
         <div class="content_wrapper">
             <div v-if="content" class="book_content_info">
                 <div class="book_name"><h1>《{{book_name}}》</h1></div>
-                <div class="chapter"><h2>{{content.chapter}}</h2></div>
+                <div class="chapter"><h2>第{{content.chapter_order}}章 {{content.chapter}}</h2></div>
                 <div class="read_count">点击: {{content.read_count}}</div>
                 <div class="collect_count">收藏: {{content.collect_count}}</div>
             </div>
