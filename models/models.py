@@ -61,20 +61,20 @@ class Comment(ModelA):
         indexes = [("book_content", "create_time")]
 
 
-class CommentAgree(ModelA):
-    """
-    点赞
-    """
-    user = fields.ForeignKeyField(model_name="models.User", related_name="agrees")
-    comment = fields.ForeignKeyField(model_name="models.Comment", related_name="agrees")
-
-
 class Collection(ModelA):
     """
     收藏
     """
     user = fields.ForeignKeyField(model_name="models.User", related_name="collections")
     content = fields.ForeignKeyField(model_name="models.BookContent")
+
+
+class CommentAgree(ModelA):
+    """
+    点赞
+    """
+    user = fields.ForeignKeyField(model_name="models.User", related_name="agrees")
+    comment = fields.ForeignKeyField(model_name="models.Comment", related_name="agrees")
 
 
 class LevelEnum(IntEnum):

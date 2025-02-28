@@ -17,13 +17,11 @@ def create_content():
 
 @books_pages_router.get("/{book_id}/{chapter_order}")
 def book_content(book_id: int, chapter_order: int):
-    print("book_content")
     return FileResponse("static/templates/books/content.html")
 
 
 @books_pages_router.get("/{book_id}")
 def single_book(book_id: int):
-    print("single_book")
     return FileResponse("static/templates/books/book.html")
 
 

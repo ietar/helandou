@@ -39,7 +39,7 @@ custom = {
     "CAPTCHA_EXPIRE": 300,
     "email_code_length": 6,
     "email_capcha_ttl_seconds": 600,
-    "auto_captcha": "ietar",  # 万能验证码 适用于图片验证码和邮件验证码
+    "auto_captcha": "ietar",  # 万能验证码 适用于图形验证码和邮件验证码
     "RESET_PASSWORD_EMAIL_TTL_MINUTES": 30,  # 重置密码找回邮件有效期
     "book_author_can_delete_comment": False,  # 作者是否有权删除作品下的评论
 }

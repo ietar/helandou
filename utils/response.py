@@ -50,6 +50,20 @@ def public_wrap_response(model: Model | List[Model], success=True, msg=""):
     return wrap_response(data, success, msg)
 
 
+def public_response(model: Model) -> dict:
+    """
+    过滤出科访问的属性字典
+    :param model:
+    :return:
+    """
+    slots = access_able(model)
+    temp = model.__dict__
+    new = {}
+    for s in slots:
+        new[s] = temp[s]
+    return new
+
+
 def response_exclude(model: Model, ex: list[str]) -> dict:
     """
     排除模型返回的某些键
@@ -73,20 +87,6 @@ def response_include(model: Model, include: list[str]) -> dict:
     temp = model.__dict__
     new = {}
     for s in include:
-        new[s] = temp[s]
-    return new
-
-
-def public_response(model: Model) -> dict:
-    """
-    过滤出科访问的属性字典
-    :param model:
-    :return:
-    """
-    slots = access_able(model)
-    temp = model.__dict__
-    new = {}
-    for s in slots:
         new[s] = temp[s]
     return new
 
