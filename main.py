@@ -12,7 +12,6 @@ from fastapi.exceptions import RequestValidationError
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import DoesNotExist
 
-
 from user.user_api import user_api_router
 from user.user_pages import user_pages_router
 from books.book_api import books_api
