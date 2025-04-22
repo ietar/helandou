@@ -1,14 +1,63 @@
-from fastapi import APIRouter, Depends, Body, Request
+from decimal import Decimal
+from fastapi import APIRouter, Depends, Body, Request, HTTPException
 from pydantic import BaseModel
-from models.models import User, Book, BookContent, LevelEnum, Collection
+import jwt
+from tortoise import transactions
 
-from utils.response import wrap_response, public_wrap_response, r401, r409, r404
-from auth import get_user_token, get_user_from_jwt
+from models.models import User, Book, BookContent, LevelEnum, Collection, Subscribe
+from utils.response import wrap_response, public_wrap_response, r401, r409, r404, r402, r400
+from utils.coins import subscribe_content_cost
+from auth import get_user_token, get_user_from_jwt, oauth2_scheme
 
 content_api = APIRouter()
 
 
 # 不好restful命名了 直接rpc
+
+# @content_api.get("/try_transaction")
+# async def try_transaction():
+#     user = await User.get(id=1)
+#     async with transactions.in_transaction() as tran:
+#         user = await User.get(id=1)
+#         try:
+#             user.coins += 1
+#             await user.save()
+#             # 1/0
+#             await tran.commit()
+#             return user
+#         except Exception as e:
+#             await tran.rollback()
+#             return {"exception": str(e)}
+
+
+@content_api.post("/subscribe/{content_id}")
+async def subscribe(content_id: int, user=Depends(get_user_from_jwt)):
+    """
+    订阅章节
+    """
+    content = await BookContent.get_or_none(id=content_id)
+    if not content:
+        return r404(msg="无此章节")
+    cost = subscribe_content_cost(content=content.content)
+    if user.coins < cost:
+        return r402(msg=f"用户余额{user.coins} 不支持该次订阅消耗{cost}")
+
+    record = await Subscribe.get_or_none(user=user, content=content)
+    if record:
+        # 不允许重复订阅
+        return r409(msg="已订阅过该章节")
+    # 开启事务
+    async with transactions.in_transaction() as tran:
+        try:
+            res = await Subscribe.create(user=user, content=content)
+            user.coins -= Decimal(cost)
+            await user.save()
+            await tran.commit()
+        except Exception as e:
+            await tran.rollback()
+            return r400(msg=str(e))
+
+    return public_wrap_response(model=res, msg="订阅成功")
 
 
 @content_api.get("/get_all_chapters/{book_id}")
@@ -33,6 +82,7 @@ class CreateContentIn(BaseModel):
     chapter_order: int
     chapter: str
     content: str
+    free: bool
 
 
 @content_api.post("/create_content/{book_id}")
@@ -61,7 +111,7 @@ async def create_content(book_id: int, body: CreateContentIn, token: dict = Depe
 
 
 @content_api.get("/{book_id}/{chapter_order}")
-async def single_content(book_id: int, chapter_order: int):
+async def single_content(book_id: int, chapter_order: int, request: Request):
     """
     获取单章正文
     """
@@ -72,11 +122,47 @@ async def single_content(book_id: int, chapter_order: int):
     content = await BookContent.get(book=book1, chapter_order=chapter_order)
     if not content:
         return r404(msg="没有该章节")
-    content.read_count += 1
-    await content.save()
+
     res = public_wrap_response(content)
     res["data"]["book_id"] = book1.id
     res["data"]["book_name"] = book1.book_name
+    res["data"]["cost"] = subscribe_content_cost(content.content)
+    res["data"]["need_subscribe"] = False
+    res["data"]["can_edit"] = False
+
+    try:
+        # 登录用户
+        token = await oauth2_scheme(request)  # 显式处理依赖 允许未登录用户访问免费章节
+        user = await get_user_from_jwt(token)
+        subscribe_record = await Subscribe.get_or_none(user=user, content=content)
+        author = await book1.author
+        if user == author or user.level >= LevelEnum.admin:  # 编辑权限
+            res["data"]["can_edit"] = True
+        if not subscribe_record and author != user:
+            # 未订阅且非作者
+            if content.free:
+                content.read_count += 1
+                await content.save()
+                # return res
+            else:
+                res["data"]["need_subscribe"] = True
+                res["data"]["content"] = "付费章节，需订阅"
+                # return res
+        else:
+            # 已订阅用户 或作者
+            content.read_count += 1
+            await content.save()
+            # return res
+    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError, jwt.DecodeError, HTTPException):
+        # 未登录用户
+        if content.free:
+            content.read_count += 1
+            await content.save()
+            # return res
+        else:
+            res["data"]["need_subscribe"] = True
+            res["data"]["content"] = "付费章节，需登录并订阅"
+            # return res
     return res
 
 
@@ -131,17 +217,34 @@ async def add_to_collection(content_id: int = Body(embed=True), user=Depends(get
     content = await BookContent.get_or_none(id=content_id, deleted=False)
     if not content:
         return r404(msg="没有该章节")
+    book = await content.book
     record = await Collection.get_or_none(user=user, content=content)
     if record:
-        content.collect_count -= 1
-        await content.save()
-        await record.delete()
-        return wrap_response(msg="取消收藏成功")
+        async with transactions.in_transaction() as tran:
+            try:
+                content.collect_count -= 1
+                await content.save()
+                book.collect_count -= 1
+                await book.save()
+                await record.delete()
+                await tran.commit()
+                return wrap_response(msg="取消收藏成功")
+            except Exception as e:
+                await tran.rollback()
+                return r400(msg=str(e))
     else:
-        content.collect_count += 1
-        await content.save()
-        new_collection = await Collection.create(user=user, content=content)
-        return public_wrap_response(new_collection, msg="收藏成功")
+        async with transactions.in_transaction() as tran:
+            try:
+                content.collect_count += 1
+                await content.save()
+                book.collect_count += 1
+                await book.save()
+                new_collection = await Collection.create(user=user, content=content)
+                await tran.commit()
+                return public_wrap_response(new_collection, msg="收藏成功")
+            except Exception as e:
+                await tran.rollback()
+                return r400(msg=str(e))
 
 
 @content_api.get("/my_collections")
@@ -160,4 +263,3 @@ async def get_my_collections(user=Depends(get_user_from_jwt)):
         res.append(temp)
 
     return wrap_response(res)
-

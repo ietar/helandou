@@ -2,6 +2,7 @@ let vm = new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],
     data: {
+        from: '',
         image_code_url: '',
         uuid: '',
         image_code: '',
@@ -15,6 +16,9 @@ let vm = new Vue({
         show_success: false,
         success_message: '',
 
+        error_login_message: '',
+        error_login: false,
+
     },
     mounted(){
 //        this.csrf = $('input[name=csrfmiddlewaretoken]').val();
@@ -24,7 +28,7 @@ let vm = new Vue({
         generate_image_code(){
             this.uuid = guid();
             $('input#uuid').val(this.uuid);
-            this.image_code_url = `/image_codes/${this.uuid}/`;
+            this.image_code_url = `/image_codes/${this.uuid}`;
         },
         check_img_code(){
             if (this.image_code.length !== 4){
@@ -72,7 +76,7 @@ let vm = new Vue({
                 let searchParams = new URLSearchParams(window.location.search);
                 let from = searchParams.get('from');
                 from = from?from:"/";
-//                console.log(from);
+                this.from = from;
 
                 e.preventDefault();
                 let url = `/api/user/login`;
@@ -96,6 +100,7 @@ let vm = new Vue({
                             // 显示成功提示
                             this.show_success = true;
                             this.countdown = 3;  // 初始化倒计时
+                            this.success_message = `注册成功，${this.countdown}秒后自动跳转至上页面...`;
                             // 更新倒计时显示
                             const timer = setInterval(() => {
                                 this.countdown -= 1;
@@ -112,12 +117,12 @@ let vm = new Vue({
                             }, 1000);
                         }
                         else{
-                            this.error_register = true;
-                            this.error_register_message = response.data.msg;
+                            this.error_login = true;
+                            this.error_login_message = response.data.msg;
                         }
                     }).catch(e => {
-                        this.error_register = true;
-                        this.error_register_message = e.response.data.msg;
+                        this.error_login = true;
+                        this.error_login_message = e.response.data.msg;
                         });
             }
         },

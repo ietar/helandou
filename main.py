@@ -80,8 +80,8 @@ async def does_not_exist_handler(request: Request, exc: DoesNotExist):
     # print(f"{type(exc).__mro__}")
     return Response(content=json.dumps({
         "success": False,
-        "data": {},
-        "msg": str(exc)
+        "data": str(exc),
+        "msg": "不存在该实体",
     }), status_code=404, media_type="application/json")
 
 
@@ -89,20 +89,17 @@ async def does_not_exist_handler(request: Request, exc: DoesNotExist):
 async def http_exception(request: Request, exc: HTTPException):
     return Response(content=json.dumps({
         "success": False,
-        "data": {},
+        "data": str(exc),
         "msg": exc.detail
     }), status_code=exc.status_code, media_type="application/json")
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_error(request: Request, exc: RequestValidationError):
-    # body = str(exc.body) if isinstance(exc.body, str) else exc.body.decode()
-    # print(exc.body, type(exc.body))
     return Response(content=json.dumps({
         "success": False,
-        # "data": body,
-        "data": {},
-        "msg": str(exc)
+        "data": str(exc),
+        "msg": exc.errors()[0]['msg']  # errors()可能有多种错误 只取第一个作为提示 详情可查看data
     }), status_code=422, media_type="application/json")
 
 
@@ -110,8 +107,8 @@ async def validation_error(request: Request, exc: RequestValidationError):
 async def all_exception(request: Request, exc: Exception):
     return Response(content=json.dumps({
         "success": False,
-        "data": {},
-        "msg": str(exc)
+        "data": str(exc),
+        "msg": "未被捕获的其他异常"
     }), status_code=500, media_type="application/json")
 
 

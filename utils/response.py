@@ -31,6 +31,11 @@ def r401(msg="身份识别失败"):
                     status_code=401, media_type="application/json")
 
 
+def r402(msg="支付失败"):
+    return Response(content=json.dumps(wrap_response(success=False, msg=msg)),
+                    status_code=402, media_type="application/json")
+
+
 def r409(msg="冲突"):
     return Response(content=json.dumps(wrap_response(success=False, msg=msg)),
                     status_code=409, media_type="application/json")
@@ -39,6 +44,11 @@ def r409(msg="冲突"):
 def r404(msg="找不到"):
     return Response(content=json.dumps(wrap_response(success=False, msg=msg)),
                     status_code=404, media_type="application/json")
+
+
+def r400(msg="内部错误"):
+    return Response(content=json.dumps(wrap_response(success=False, msg=msg)),
+                    status_code=402, media_type="application/json")
 
 
 def public_wrap_response(model: Model | List[Model], success=True, msg=""):

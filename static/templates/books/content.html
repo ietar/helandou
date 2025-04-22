@@ -27,7 +27,7 @@
             <div class="user_info" id="user_info_bar" v-cloak>
                 <div v-if="username">
                     <a class="username" href="/user/profile">[[ username ]]</a>
-                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                    <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
                     <a id="register" href="/user/register">注册</a>
@@ -37,26 +37,35 @@
         </div>
     </div>
     <div class="blank"></div>
-    <div class="book_main" id="content">
+    <div class="book_main" id="content" v-cloak>
         <div class="where_am_i2">
             <a href="/">首页</a>
             <span class="arrow">--></span>
             <a href="/books/">书籍总览</a>
             <span class="arrow">--></span>
             <a :href=`/books/${book_id}`>《{{book_name}}》</a>
-            <span class="arrow">--></span><span>{{content.chapter}}</span>
+            <span class="arrow">--></span><span>第{{ content.chapter_order}}章  {{content.chapter}}</span>
         </div>
         <div class="content_wrapper">
             <div v-if="content" class="book_content_info">
                 <div class="book_name"><h1>《{{book_name}}》</h1></div>
                 <div class="chapter"><h2>第{{content.chapter_order}}章 {{content.chapter}}</h2></div>
+                <input v-model="content.chapter" v-show="editing">
                 <div class="read_count">点击: {{content.read_count}}</div>
                 <div class="collect_count">收藏: {{content.collect_count}}</div>
+                <input type="button" @click="edit_content" v-show="can_edit" value="修改章节内容">
+                <input type="button" @click="put_content" v-show="editing" value="提交修改">
+                <div v-show="need_subscribe">
+<!--                    <input type="button" @click="subscribe" id="subscribe" value="订阅该章节">-->
+                    <input type="button" @click="subscribe" id="subscribe" v-model="subscribe_text">
+                </div>
             </div>
 
-            <div class="content">{{content.content}}</div>
+            <div class="content" v-show="!editing">{{content.content}}</div>
+<!--            <textarea id="new_content" cols="30" rows="4" v-model="content.content"></textarea>-->
+            <textarea id="new_content" v-show="editing" v-model="content.content" style="width: 100%; height: 20rem;"></textarea>
             <div v-if="!content">
-                <div>找不到该章节</div>
+                <div>{{error_msg}}</div>
             </div>
 
             <div class="content_footer">
@@ -78,6 +87,9 @@
                         <span class="agree_span">
                             <a href="#" class="agree" @click.prevent="agree(comment.id)">👍</a>
                             <span class="comment_agree">{{comment.agree_count}}</span>
+                        </span>
+                        <span class="delete_span">
+                            <a href="#" class="error_tip" @click.prevent="delete_comment(comment.id)">❌</a>
                         </span>
                     </div>
                 </div>

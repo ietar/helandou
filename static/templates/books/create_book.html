@@ -27,7 +27,7 @@
             <div class="user_info" id="user_info_bar" v-cloak>
                 <div v-if="username">
                     <a class="username" href="/user/profile">[[ username ]]</a>
-                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                    <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
                     <a id="register" href="/user/register">注册</a>
@@ -38,7 +38,7 @@
     </div>
     <div class="main header_bottom flex_column">
         <div class="where_am_i2">
-            <a href="/">首页</a><span class="arrow">--></span><a href="/books/create_book/">创建书籍</a>
+            <a href="/">首页</a><span class="arrow">--></span><a href="/books/">书籍总览</a><span class="arrow">--></span><a href="/books/create_book/">创建书籍</a>
         </div>
         <div id="create_book">
             <div style="margin:1rem">

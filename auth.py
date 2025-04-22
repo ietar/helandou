@@ -7,9 +7,10 @@ from models.models import User
 
 USER_TOKEN_EXPIRE_MINUTES = 300
 USER_TOKEN_EXPIRE_SECONDS = 1
-USER_TOKEN_SECRET = ""
+USER_TOKEN_SECRET = "4f5de3cf1e6276d6aca1875e7f69fc3538b152f4612a41532ebd7da48145afad"  # openssl rand -hex 32
 ALGO = "HS256"
-oauth2_scheme = OAuth2PasswordBearer("/api/user/login_form")
+# oauth2_scheme = OAuth2PasswordBearer("/api/user/login_form")
+oauth2_scheme = OAuth2PasswordBearer("/api/user/login")
 
 
 def create_user_token(data: dict) -> str:

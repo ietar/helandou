@@ -1,2 +1,3 @@
-0: 图片验证码 k-v  img_code_{uuid}: captcha
-1: 限流记录 k-v  ip__path: last_access_time  设定ttl
+0: 图片验证码 k-v  {img_code}_{uuid}: {captcha}
+1: 限流记录 k-v  {ip}__{path}: {last_access_time}  设定ttl
+2: 领币记录 k-v {from}__{user_id}: {ts} ttl=24h  from为领币途径 user_id为用户id ts为时间戳

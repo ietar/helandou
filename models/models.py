@@ -1,8 +1,18 @@
+# import hmac
 from enum import Enum, IntEnum
+from hashlib import sha256
 from tortoise import fields
 # from tortoise.models import Model
 # from pydantic import EmailStr
 from utils.models import ModelA, LogicalDeleteMixin
+
+
+class Subscribe(ModelA):
+    """
+    订阅
+    """
+    user = fields.ForeignKeyField(model_name="models.User", related_name="subscribes")
+    content = fields.ForeignKeyField(model_name="models.BookContent", related_name="subscribes")
 
 
 class Book(ModelA, LogicalDeleteMixin):
@@ -28,6 +38,8 @@ class BookContent(ModelA, LogicalDeleteMixin):
     content = fields.TextField(description="正文内容")
     collect_count = fields.IntField(default=0, description="收藏数")
     read_count = fields.IntField(default=0, description="阅读数")
+    free = fields.BooleanField(default=True, description="是否为免费章节")
+    volume = fields.IntField(default=1, description="卷数")
 
     class Meta:
         ordering = ["chapter_order"]
@@ -95,12 +107,16 @@ class User(ModelA, LogicalDeleteMixin):
     _salt = fields.CharField(max_length=128, description="避免同样密码加密得同样")
     _reset_password_salt = fields.CharField(max_length=64, null=True, blank=True, description="重置密码salt")
     reset_time = fields.DatetimeField(null=True, description="重置密码时间")
+    coins = fields.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def get_salt(self):
         return self._salt
 
     def get_pwd(self):
         return self._password
+
+    def set_pwd(self, pwd):
+        self._password = sha256((pwd + self._salt).encode("utf-8")).hexdigest()
 
 
 class CellEnum(Enum):

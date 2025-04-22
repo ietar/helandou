@@ -31,7 +31,7 @@ async def search_books(q=Query()):
 
 @books_api.get("/")
 async def all_books():
-    books = await Book.filter(deleted=False).select_related("author").values(
+    books = await Book.filter(deleted=False).select_related("author").order_by("-read_count").values(
         "id", "book_name", "digest", "read_count",
         "collect_count", "create_time", "update_time",
         author_id="author__id",

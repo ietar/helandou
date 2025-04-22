@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>用户中心 -- 胡萝呗</title>
+    <title>用户中心 -- 荷兰豆</title>
     <link rel="stylesheet" href="/static/css/default.css">
     <script type="text/javascript" src="/static/js/vue.min.js"></script>
     <script type="text/javascript" src="/static/js/jquery-3.4.1.js"></script>
@@ -13,7 +13,9 @@
     <div class="header clearfix">
         <div class="container">
             <div class="where_am_i">
-                <a href="/">首页</a> >> <a href={{ url('account:profile') }}>用户中心</a>
+                <a href="/">首页</a>
+                <span class="arrow">--></span>
+                <a href="/user/profile">用户中心</a>
             </div>
             <div class="search_bar" id="search_bar" v-cloak>
                 <form action="/search/" method="get">
@@ -23,59 +25,56 @@
             </div>
             <div class="user_info" id="user_info_bar" v-cloak>
                 <div v-if="username">
-                    <a class="username" href={{ url('account:profile') }}>[[ username ]]</a>
-                    <a id="logout" href={{ url('account:logout') }}>退出</a>
+                    <a class="username" href="/user/profile">[[ username ]]</a>
+                    <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
-                    <a id="register" href={{ url('account:register') }}>注册</a>
-                    <a id="login" href={{ url('account:login') }}>登录</a>
+                    <a id="register" href="/user/register">注册</a>
+                    <a id="login" href="/user/login">登录</a>
                 </div>
             </div>
         </div>
     </div>
     <div class="header_bottom">
-        <div class="left_side_navigation">
-            <ul>
-                <li><a href="{{ url('account:profile') }}" class="choosing">个人信息</a></li>
-{#                <li><a href="{{ url('goods:carts') }}">购物车</a></li>#}
-{#                <li><a href="{{ url('users:address') }}">收货地址</a></li>#}
-{#                <li><a href="{{ url('users:orders') }}">全部订单</a></li>#}
-{#                <li><a href="{{ url('account:reset_password') }}">重置密码</a></li>#}
-            </ul>
-        </div>
         <div class="content">
             <div id="app" v-clock>
-                {{ csrf_input }}
                 <div class="user_info">
-                    <div><span>用户名: </span><span id="username">[[ username ]] </span></div>
-                    <div><span>上次登录时间: </span><span id="last_login" >[[ last_login ]] </span></div>
-                    <div><span>上次登录ip: </span><span id="login_ip">[[ login_ip ]] </span></div>
+                    <div><span>用户名: </span><span id="username">{{ username }} </span></div>
+                    <div><span>代币: </span><span id="coins">{{ coins }}</span></div>
+                    <div><span>上次登录时间: </span><span id="last_login" >{{ last_login }} </span></div>
+                    <div><span>上次登录ip: </span><span id="login_ip">{{ login_ip }} </span></div>
+                    <div>
+                        <span>修改密码: </span>
+                        <input id="former_password" v-model="former_password" placeholder="旧密码 必填" disabled>
+                        <input id="new_password" v-model="new_password" placeholder="新密码 选填" disabled>
+                    </div>
                     <div>
                         <span>邮箱: </span>
                         <input id="email" v-model="email" disabled>
-                        <input type="button" @click="edit_email" value="修改">
-                        <input type="button" @click="save_email" value="保存">
-                        <span class="error_tip" v-show="show_email_msg" id="email_msg">[[ email_msg ]]</span>
+                        <span class="error_tip" v-show="mobile_msg" id="email_msg">{{ email_msg }}</span>
                     </div>
                     <div>
                         <span>手机: </span>
                         <input id="mobile" v-model="mobile" disabled>
-                        <input type="button" @click="edit_mobile" value="修改">
-                        <input type="button" @click="save_mobile" value="保存">
-                        <span class="error_tip" v-show="show_mobile_msg" id="mobile_msg">[[ mobile_msg ]]</span>
+                        <span class="error_tip" v-show="mobile_msg" id="mobile_msg">{{ mobile_msg }}</span>
                     </div>
+                    <input type="button" @click="edit" value="修改">
+                    <input type="button" @click="save" value="保存">
                 </div>
-{#                <div class="browse_history">#}
-{#                    <h2>浏览记录:</h2>#}
-{#                    <div class="history" v-for="(sku, index) in all_history">#}
-{#                        <a :href="'/detail/' + sku.id">#}
-{#                            <img :src=sku.default_image alt="默认图片" class="sku_mini_image">#}
-{#                        </a>#}
-{#                        <span class="delete_history clickable" @click="delete_history(sku.id, index)">x</span>#}
-{#                        <div class="name">[[ sku.name ]]</div>#}
-{#                        <div class="price"><span>价格: </span>[[ sku.price ]]</div>#}
-{#                    </div>#}
-{#                </div>#}
+                <div>
+                    <span class="error_free_tip" v-show="msg">{{ msg }}</span>
+                    <span class="error_tip" v-show="error_msg" id="error_msg">{{ error_msg }}</span>
+                </div>
+                <div class="books">
+                    <h3>我创建的书籍：</h3>
+                    <dl>
+                        <dd v-for="book in books" class="single_book">
+                            <a :href=`/books/${book.id}/` class="book-link">
+                              《{{ book.book_name }}》
+                            </a>
+                        </dd>
+                    </dl>
+                </div>
             </div>
         </div>
     </div>

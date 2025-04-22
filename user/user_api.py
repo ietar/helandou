@@ -5,7 +5,7 @@ import re
 import random
 import hmac
 import datetime
-# import time
+import time
 from hashlib import sha256
 
 from fastapi import APIRouter, Request, Response, Body, Depends, Form
@@ -13,13 +13,27 @@ from pydantic import BaseModel, EmailStr, field_validator
 
 from models.models import User, LevelEnum
 from utils.response import wrap_response, get_captcha_by_uuid, public_wrap_response, \
-    r401, get_email_code_by_uuid, r404
-from utils.any import mk_chars, ip2int, hidden_email
+    r401, get_email_code_by_uuid, r404, public_response
+from utils.any import mk_chars, ip2int, hidden_email, int2ip
 from utils.sendmail import send
 from settings import custom
-from auth import create_user_token, get_user_token, USER_TOKEN_EXPIRE_MINUTES
+from auth import create_user_token, get_user_token, USER_TOKEN_EXPIRE_MINUTES, get_user_from_jwt
+from utils.connections import get_redis_connection
 
 user_api_router = APIRouter()
+
+
+@user_api_router.post("/vivo50")
+async def vivo50(user=Depends(get_user_from_jwt)):
+    """通过首页vivo50渠道每日领币"""
+    r = await get_redis_connection(db=2)
+    if await r.get(f"vivo50__{user.id}"):
+        return wrap_response(success=False, msg="24h内已有领币记录")
+    amount = random.randrange(0, 50)
+    await r.setex(name=f"vivo50__{user.id}", value=time.time(), time=60*60*24)
+    user.coins += amount
+    await user.save()
+    return wrap_response({"amount": amount})
 
 
 @user_api_router.get("/greet")
@@ -170,10 +184,10 @@ class RegisterUserIn(BaseModel):
 
 
 class PutUserIn(BaseModel):
-    former_username: str
+    # former_username: str
     former_password: str
-    username: str
-    password: str
+    # username: str
+    new_password: str  # 绝了 就是不能叫_password
     email: EmailStr
     mobile: str
 
@@ -262,7 +276,10 @@ class LoginBody(BaseModel):
 
 @user_api_router.post("/login_form", include_in_schema=False)
 async def login2(response: Response, username=Form(), password=Form()):
-    """给swagger开个后门"""
+    """
+    给swagger开个后门
+    不太行 swagger_ui不会自己装header
+    """
     user = await User.get_or_none(username=username)
     if not user:
         return r401()
@@ -273,7 +290,7 @@ async def login2(response: Response, username=Form(), password=Form()):
             "username": username,
             "level": user.level,
         })
-        # todo swagger ui 不装token难用啊
+        # swagger ui 不装token难用啊
         response.headers["Authorization"] = f"Bearer {token}"
         # response.set_cookie(key="WWW-authenticate", value=f"Bearer {token}", httponly=True)
         return wrap_response({"token": token})
@@ -295,7 +312,7 @@ async def login(request: Request, response: Response, body: LoginBody):
 
     user = await User.get_or_none(username=username)
     if not user:
-        return r401()
+        return r401(msg="无此用户")
     if user.deleted:
         return r401(msg="用户已注销")
     sign = sha256((password + user.get_salt()).encode("utf-8")).hexdigest()
@@ -329,9 +346,26 @@ async def read_user_token(token: dict = Depends(get_user_token)):
 
 
 @user_api_router.get("/{user_id}")
-async def single_user(user_id: int):
-    result = await User.get(id=user_id)
-    return public_wrap_response(result)
+async def single_user(user_id: int, user=Depends(get_user_from_jwt)):
+    query_user = await User.get(id=user_id)
+    books = await query_user.books
+
+    if user.level < LevelEnum.admin and user.id != user_id:
+        # 仅获取部分信息 username id level books
+        data = {
+            "username": query_user.username,
+            "id": query_user.id,
+            "level": query_user.level,
+            "books": [public_response(book) for book in books]
+        }
+        return wrap_response(data)
+
+    else:
+        # 获取全部信息
+        data = public_response(query_user)
+        data["login_ip"] = int2ip(data["login_ip"])
+        data["books"] = [public_response(book) for book in books]
+        return wrap_response(data)
 
 
 @user_api_router.delete("/{user_id}")
@@ -355,18 +389,18 @@ async def delete_user(body: LoginBody):
 
 
 @user_api_router.put("/")
-async def put_userinfo(body: PutUserIn):
+async def put_userinfo(body: PutUserIn, user=Depends(get_user_from_jwt)):
     body = body.dict()
-    username = body.pop("former_username")
-    password = body.pop("former_password")
-    user = await User.get_or_none(username=username)
-    if not user:
-        return r401()
-    sign = sha256((password + user.get_salt()).encode("utf-8")).hexdigest()
+    former_password = body.pop("former_password")
+    sign = sha256((former_password + user.get_salt()).encode("utf-8")).hexdigest()
     if sign == user.get_pwd():
-        await user.update_from_dict(data=body)
+
+        user.set_pwd(body.pop("new_password"))
+
+        await user.update_from_dict(data=body).save()  # password可为空 即不更新
         await user.save()
-        return public_wrap_response(user)
+        # print(user.get_pwd())
+        return public_wrap_response(user, msg="更新用户信息成功")
     else:
-        return r401()
+        return r401(msg="旧密码输入错误")
 

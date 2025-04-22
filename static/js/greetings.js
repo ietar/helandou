@@ -3,8 +3,12 @@ let greet = new Vue({
     data:{
         counts: 0,
         latest: null,
+        auth:'',
+        error_msg:'',
+        error_free_msg:'',
     },
     mounted(){
+        this.get_auth();
         this.greet()
     },
     methods:{
@@ -21,8 +25,26 @@ let greet = new Vue({
                 if (res.data.success) {
                     this.counts = res.data.data.counts;
                     this.latest = res.data.data.latest;
-                    console.log(this.counts, this.latest);
                 }
             }).catch(e => {console.log(e)})
-        }
-}});
+        },
+        vivo50(){
+            if(!this.auth){
+                this.error_msg = '未登录';
+                this.error_free_msg = '';
+            }
+            else{
+                axios.post(`/api/user/vivo50`,{},{headers:{'Authorization': this.auth}, responseType: 'json'})
+                .then(res => {
+                    if (res.data.success) {
+                        this.error_free_msg = `领到了${res.data.data.amount}`;
+                        this.error_msg = '';
+                    } else {
+                        this.error_msg = res.data.msg || '未知错误';
+                        this.error_free_msg = '';
+                    }
+                }).catch(e => {
+                    this.error_msg=e.response.data.msg || e;this.error_free_msg = '';
+                })
+            }
+}}});

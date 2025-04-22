@@ -51,7 +51,7 @@
                 </li>
                 <li>
                     <label for="pic_code">图形验证码</label>
-                    <input type="text" name="image_code" id="pic_code" class="msg_input" placeholder="图形验证码" v-model="image_code" @blur="check_img_code">
+                    <input type="text" autocomplete="off" name="image_code" id="pic_code" class="msg_input" placeholder="图形验证码" v-model="image_code" @blur="check_img_code">
                     <img :src="image_code_url" alt="图形验证码" class="pic_code" @click="generate_image_code" >
                     <span class="error_tip" v-show="error_img_code">[[ error_img_message ]]</span>
                 </li>
@@ -63,8 +63,12 @@
                     <span class="success-icon">✓</span>
                     <span class="success-text">[[ success_message ]]</span>
                     <div class="manual-jump">
-                        不想等待？<a href="/" class="jump-link">立即回到首页</a>
+                        <div><a :href=`${from}` class="jump-link">立即跳转</a></div>
+                        <div><a href="/" class="jump-link">回到首页</a></div>
                     </div>
+                </li>
+                <li class="error_tip">
+                    <span>[[ error_login_message ]]</span>
                 </li>
             </ul>
         </form>

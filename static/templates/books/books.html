@@ -15,7 +15,7 @@
 <body>
     <div class="header clearfix">
         <div class="container">
-            <div class="where_am_i2">
+            <div class="where_am_i">
                 <a href="/">首页</a>
             </div>
             <div class="search_bar" id="search_bar" v-cloak>
@@ -27,7 +27,7 @@
             <div class="user_info" id="user_info_bar" v-cloak>
                 <div v-if="username">
                     <a class="username" href="/user/profile">[[ username ]]</a>
-                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                    <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
                     <a id="register" href="/user/register">注册</a>
@@ -41,14 +41,17 @@
             <a href="/">首页</a><span class="arrow">--></span><a href="/books/">书籍总览</a>
         </div>
         <div class="books">
+            <dl>
+                <dd v-for="book in books" class="single_book">
+                    <a :href=`/books/${book.id}/` class="book-link">
+                        <h4>《[[ book.book_name ]]》</h4>
+                        <span>作者： [[ book.author ]]</span>
+                        <span>点击： [[ book.read_count ]]</span>
+                        <span>收藏： [[ book.collect_count ]]</span>
 
-        <dl>
-            <dd v-for="book in books" class="single_book">
-                <a :href=`/books/${book.id}/` class="book-link">
-                  《[[ book.book_name ]]》
-                </a>
-            </dd>
-        </dl>
+                    </a>
+                </dd>
+            </dl>
         </div>
 
         <div class="collections" id="collections">
@@ -66,7 +69,6 @@
             <span>
                 <a href="/books/create_content/" class="blue_white_button">创建章节</a>
             </span>
-
         </div>
 
     </div>
