@@ -10,6 +10,11 @@ def profile_page():
     return FileResponse("static/templates/user/profile.html")
 
 
+@user_pages_router.get("/profile")
+def profile_page():
+    return FileResponse("static/templates/user/profile.html")
+
+
 @user_pages_router.get("/register")
 def register_page():
     # ok
@@ -30,7 +35,7 @@ def forget_password_page():
 
 @user_pages_router.get("/reset_password")
 def reset_password_page():
-    # todo
+    # ok
     return FileResponse("static/templates/user/reset.html")
 
 

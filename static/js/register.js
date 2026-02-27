@@ -98,13 +98,11 @@ let vm = new Vue({
         check_password(){
             let re = /^[a-zA_Z0-9-_@]{8,20}$/;
             this.error_password = !re.test(this.password);
-
         },
         check_password2(){
             this.error_password2 = Boolean(this.password !== this.password2);
         },
         check_email(){
-            // let re = /^1[3-9]\d{9}$/;
             let re = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
             if (re.test(this.email)){
                 this.error_email = false;
@@ -118,7 +116,6 @@ let vm = new Vue({
         },
         check_mobile(){
              let re = /^1[3-9]\d{9}$/;
-//            let re = /^1(3\d|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8\d|9[0-35-9])\d{8}$/;
             if (re.test(this.mobile)){
                 this.error_mobile = false;
                 this.error_mobile_message = '';
@@ -143,7 +140,6 @@ let vm = new Vue({
             axios.get(url)
                 .then(response => {
                     if (response.data.success === true){
-//                    console.log(response.data);
                         if (response.data.data.code === this.img_code){
                             this.error_img_code = false;
                         }
@@ -162,7 +158,7 @@ let vm = new Vue({
             this.error_allow = !this.allow;
         },
         send_email_code(){
-            if (this.error_mobile){
+            if (this.error_email){
                 this.error_email_code = true;
                 this.error_email_code_message = '请先输入正确的邮箱';
                 return false
@@ -176,12 +172,9 @@ let vm = new Vue({
             axios({
                 url: url,
                 method: 'post',
-                // data: JSON.stringify({'uuid': self.uuid, 'mobile': self.mobile}),
                 data: {'uuid': this.uuid, 'email': this.email},
                 headers: {
                     'Content-Type':'application/json',
-                    // 'Content-Type':'application/x-www-form-urlencoded',
-                    // 'X-CSRFToken': window.sessionStorage.getItem("csrf_token")
                     'X-CSRFToken': this.csrf,
                 }})
                 .then(response => {
@@ -204,7 +197,6 @@ let vm = new Vue({
             this.check_email();
             this.check_img_code();
             this.check_allow();
-
             if (this.error_name || this.error_password || this.error_password2 || this.error_email || this.error_allow || this.error_img_code || this.error_email_code)
             {
                 console.log('not bingo');
@@ -229,8 +221,6 @@ let vm = new Vue({
                     },
                     headers: {
                         'Content-Type':'application/json',
-                        // 'Content-Type':'application/x-www-form-urlencoded',
-                        // 'X-CSRFToken': window.sessionStorage.getItem("csrf_token")
                         'X-CSRFToken': this.csrf,
                     }})
                     .then(response => {
@@ -248,7 +238,7 @@ let vm = new Vue({
 
                                 if (this.countdown <= 0) {
                                     clearInterval(timer);
-                                    window.location.href = "/user/login";
+                                    window.location.href = "/";
                                 }
                             }, 1000);
                         }

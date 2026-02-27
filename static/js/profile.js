@@ -3,6 +3,9 @@ let ap_books = new Vue({
     data:{
         id:'',
         username: '',
+        coins:0,
+        nickname: '',
+        nickname_msg: '',
         last_login: '',
         login_ip: '',
         email: '',
@@ -37,6 +40,7 @@ let ap_books = new Vue({
                     .then(res => {
                         if(res.data.success){
                             this.username = res.data.data.username;
+                            this.nickname = res.data.data.nickname;
                             this.level = res.data.data.level;
                             this.email = res.data.data.email;
                             this.mobile = res.data.data.mobile;
@@ -62,6 +66,7 @@ let ap_books = new Vue({
 //            $('#email').attr('disabled', false);
 //            $('#mobile').attr('disabled', false);
             $('#email').prop('disabled', !$('#email').prop('disabled'))
+            $('#nickname').prop('disabled', !$('#nickname').prop('disabled'))
             $('#mobile').prop('disabled', !$('#mobile').prop('disabled'))
             $('#former_password').prop('disabled', !$('#former_password').prop('disabled'))
             $('#new_password').prop('disabled', !$('#new_password').prop('disabled'))
@@ -70,7 +75,8 @@ let ap_books = new Vue({
             let params = {"former_password": this.former_password,
             "new_password": this.new_password,
             "email":this.email,
-            "mobile":this.mobile};
+            "mobile":this.mobile,
+            "nickname": this.nickname};
             axios.put(`/api/user/`,params,{headers:{'Authorization': this.auth}, responseType: 'json'})
             .then(res => {
                 if (res.data.success) {

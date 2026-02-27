@@ -71,3 +71,29 @@ function resize(designWidth, maxWidth) {
 
 }
 $(document).ready(resize(1920, 1920));
+
+function flash_msg(msg, success=true) {
+    // 创建消息框元素
+    const messageBox = document.createElement('div');
+    messageBox.classList.add('flash-message');
+    messageBox.textContent = msg;
+
+    // 根据 success 参数添加不同的类名
+    if (success) {
+        messageBox.classList.add('success');
+    } else {
+        messageBox.classList.add('error');
+    }
+
+    // 将消息框添加到页面中
+    document.body.appendChild(messageBox);
+
+    // 3 秒后淡出消息框
+    setTimeout(() => {
+        messageBox.style.opacity = 0;
+        setTimeout(() => {
+            // 淡出完成后移除消息框
+            document.body.removeChild(messageBox);
+        }, 300); // 等待淡出动画完成
+    }, 3000);
+    }

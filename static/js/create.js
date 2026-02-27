@@ -41,7 +41,6 @@ let create_content = new Vue({
     data:{
         books: [],
         book_id: '',
-        chapter_order: '',
         chapter: '',
         content: '',
         book_id: '',
@@ -76,7 +75,7 @@ let create_content = new Vue({
             this.error = '';
             this.msg = '';
             axios.post(`/api/content/create_content/${this.book_id}`,
-             {"chapter_order": this.chapter_order, "chapter": this.chapter, "content": this.content, "free": this.free},
+             {"chapter": this.chapter, "content": this.content, "free": this.free},
               {headers:{'Authorization': this.auth}, responseType: 'json'})
             .then(res => {
                 if (res.data.success) {

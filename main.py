@@ -18,11 +18,12 @@ from books.book_api import books_api
 from books.content_api import content_api
 from books.comment_api import comment_api
 from books.books_pages import books_pages_router
-from api.poke_maps import poke_maps_api
+from books.content_pages import content_pages_router
+# from api.poke_maps import poke_maps_api
 from verifications.urls import verification_router
 from settings import setting1, custom
 from utils.response import wrap_response
-from utils.middlewares import ThrottlingMiddleware, RedisThrottlingMiddleware
+from utils.middlewares import RedisThrottlingMiddleware
 from utils.connections import get_redis_connection
 
 produce = custom.get("produce", False)
@@ -33,15 +34,14 @@ app.include_router(prefix="/api/user", router=user_api_router, tags=["user"])
 app.include_router(prefix="/api/books", router=books_api, tags=["book"])
 app.include_router(prefix="/api/content", router=content_api, tags=["content"])
 app.include_router(prefix="/api/comment", router=comment_api, tags=["comment"])
-
-app.include_router(prefix="/api/poke_maps", router=poke_maps_api, tags=["poke_maps"])
 app.include_router(prefix="", router=verification_router, tags=["verifications"])
 # pages
 app.include_router(prefix="/user", router=user_pages_router, tags=["user_pages"])
 app.include_router(prefix="/books", router=books_pages_router, tags=["books_pages"])
+app.include_router(prefix="/content", router=content_pages_router, tags=["content_pages"])
 
 app.mount(path="/static", app=StaticFiles(directory="static"))
-register_tortoise(app=app, config=setting1)
+register_tortoise(app=app, config=setting1, add_exception_handlers=not produce)
 app.add_middleware(
     CORSMiddleware,
     allow_origins="*",
@@ -49,10 +49,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-if custom.get("redis_throttling"):
-    app.add_middleware(RedisThrottlingMiddleware)
-else:
-    app.add_middleware(ThrottlingMiddleware)
+app.add_middleware(RedisThrottlingMiddleware)
+
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -63,7 +61,6 @@ async def favicon():
 @lru_cache(maxsize=16)
 @app.get("/anything")
 async def anything():
-    # todo use redit cache
     data = custom.get("anything")
     return wrap_response(data)
 
@@ -153,25 +150,6 @@ async def ws_test(ws: WebSocket):
         pass
 
 
-# @app.middleware("http")
-# async def m2(request: Request, call_next):
-#     begin = time.time()
-#     print("m2 in")
-#     response = await call_next(request)
-#     print("m2 out")
-#     response.headers["timeit"] = str(time.time() - begin)
-#     return response
-#
-#
-# @app.middleware("http")
-# async def m1(request: Request, call_next):
-#     print("m1 in")
-#     response = await call_next(request)
-#     print("m1 out")
-#     return response
-
-
 if __name__ == '__main__':
     import uvicorn
-
     uvicorn.run(app="main:app", port=8080, reload=True)

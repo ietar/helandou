@@ -25,9 +25,9 @@
                 </form>
             </div>
             <div class="user_info" id="user_info_bar" v-cloak>
-                <div v-if="username">
-                    <a class="username" href="/user/profile">[[ username ]]</a>
-                    <a id="logout" href="/user/logout" onclick="deleteCookie('Authorization')">退出</a>
+                <div v-if="nickname">
+                    <a class="nickname" href="/user/profile">[[ nickname ]]</a>
+                    <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
                     <a id="register" href="/user/register">注册</a>
@@ -83,13 +83,10 @@
                         <input type="text" name="email_code" id="email_code" placeholder="邮箱验证码" v-model="email_code">
                         <span class="send_email_code blue_white_button" @click="send_email_code">发送邮件验证码</span>
                         <span class="error_tip" v-show="error_email_code">[[ error_email_code_message ]]</span>
-                        <!--                </li>-->
-                        <!--                <li id="email_code_error_status_code_rel" style="display:none">-->
-                        <!--                </li>-->
                     <li class="agreement">
                         <input type="checkbox" name="allow" id="allow" v-model="allow" @change="check_allow">
-                        <label for="allow">同意xxx协议</label>
-                        <span class="error_tip" v-show="error_allow">请勾选xxx协议</span>
+                        <label for="allow">同意<a href="#">用户协议</a></label>
+                        <span class="error_tip" v-show="error_allow">请同意用户协议</span>
                         <span class="error_tip" v-show="error_register">[[ error_register_message ]]</span>
                     </li>
                     <li class="reg_sub">

@@ -1,9 +1,6 @@
-# import hmac
-from enum import Enum, IntEnum
+from enum import  IntEnum
 from hashlib import sha256
 from tortoise import fields
-# from tortoise.models import Model
-# from pydantic import EmailStr
 from utils.models import ModelA, LogicalDeleteMixin
 
 
@@ -19,30 +16,29 @@ class Book(ModelA, LogicalDeleteMixin):
     """
     书籍
     """
-    book_name = fields.CharField(max_length=64, index=True)
+    book_name = fields.CharField(max_length=64, index=True, description="书籍名")
     author = fields.ForeignKeyField(model_name="models.User", related_name="books")  # 作者
-    digest = fields.TextField()  # 简介
-    # current = fields.IntField()
+    digest = fields.TextField(description="简介")  # 简介
+    cover = fields.CharField(max_length=255,null=True,default="/static/img/cover_0.jpg", description="封面")
     read_count = fields.IntField(default=0, description="阅读次数")
     collect_count = fields.IntField(default=0, description="收藏数")
-    using = fields.BooleanField(default=False, description="是否写入中")
+    # using = fields.BooleanField(default=False, description="是否写入中")
 
 
 class BookContent(ModelA, LogicalDeleteMixin):
     """
-    书籍正文
+    章节
     """
     book = fields.ForeignKeyField(model_name="models.Book", related_name="contents")  # 所属书籍
-    chapter_order = fields.IntField(description="章节数", index=True, unique=True)
     chapter = fields.CharField(max_length=64, description="章节名")
     content = fields.TextField(description="正文内容")
-    collect_count = fields.IntField(default=0, description="收藏数")
+    # collect_count = fields.IntField(default=0, description="收藏数")
     read_count = fields.IntField(default=0, description="阅读数")
     free = fields.BooleanField(default=True, description="是否为免费章节")
-    volume = fields.IntField(default=1, description="卷数")
+    # volume = fields.IntField(default=1, description="卷数")
 
     class Meta:
-        ordering = ["chapter_order"]
+        ordering = ["create_time"]
 
 
 class Comment(ModelA):
@@ -61,11 +57,13 @@ class Comment(ModelA):
     )
     parent_comment = fields.ForeignKeyField(
         model_name="models.Comment",
-        related_name="replies",
+        related_name="children",
         null=True,
         description="父级评论"
     )
     content = fields.TextField(description="评论内容")
+    paragraph = fields.IntField(description="关联段落序号", default=-1)  # -2悬挂 -1章评 0以上段评
+    paragraph_digest = fields.CharField(max_length=64,null=True, description="关联段落的摘要")
     agree_count = fields.IntField(default=0, description="点赞数")
 
     class Meta:
@@ -97,17 +95,19 @@ class LevelEnum(IntEnum):
 
 
 class User(ModelA, LogicalDeleteMixin):
-    username = fields.CharField(max_length=32, description="用户名", db_index=True, unique=True)
+    username = fields.CharField(max_length=32, description="用户名", unique=True)
     _password = fields.CharField(max_length=128, description="密码")
     email = fields.CharField(max_length=128, description="邮箱")
     level = fields.IntEnumField(enum_type=LevelEnum, description="权限等级")
-    mobile = fields.CharField(max_length=16, description="手机", default="0", db_index=True, unique=True)
+    mobile = fields.CharField(max_length=16, description="手机", default="0", unique=True)
+    nickname = fields.CharField(max_length=32, description="昵称", unique=True)
     last_login = fields.DatetimeField(null=True, description="上次登录时间")
     login_ip = fields.IntField(null=True, description="登录ip")
     _salt = fields.CharField(max_length=128, description="避免同样密码加密得同样")
     _reset_password_salt = fields.CharField(max_length=64, null=True, blank=True, description="重置密码salt")
     reset_time = fields.DatetimeField(null=True, description="重置密码时间")
-    coins = fields.DecimalField(max_digits=12, decimal_places=2, default=0)
+    coins = fields.DecimalField(max_digits=12, decimal_places=2, default=0, description="代币数")
+    avatar = fields.CharField(max_length=255,null=True,default="/static/img/avatar_0.jpg", description="头像")
 
     def get_salt(self):
         return self._salt
@@ -116,113 +116,88 @@ class User(ModelA, LogicalDeleteMixin):
         return self._password
 
     def set_pwd(self, pwd):
-        self._password = sha256((pwd + self._salt).encode("utf-8")).hexdigest()
+        self._password = self.make_pwd(pwd)
 
-
-class CellEnum(Enum):
-    """格子类型"""
-    void = 0
-    grass = 1
-    sea = 2
-
-
-class CellState(Enum):
-    """格子状态"""
-    normal = 0
-    burn = 1
-    blocked = 2
-
-
-class Cell(object):
-    _type: CellEnum  # 类型
-    state: CellState  # 状态
-
-    def __init__(self, _type: str):
-        self._type = CellEnum[_type]
-        self.state = CellState["normal"]
-
-    def __str__(self):
-        # return f"Cell type:{self._type.name} state:{self.state}"
-        return str(self.to_dict())
-
-    def __repr__(self):
-        return self.__str__()
-
-    def to_dict(self):
-        return {
-            'type': self._type.name,
-            'state': self.state.name
-        }
-
-
-class Area(ModelA, LogicalDeleteMixin):
-    """区域"""
-    # id = fields.IntField(pk=True, generated=True)
-    name = fields.CharField(max_length=32, default="", description="区域名", db_index=True)
-    father = fields.ForeignKeyField(model_name="models.Area", null=True, related_name="children")
-    # deleted = fields.BooleanField(default=False, description="逻辑删除", db_index=True)
-
-
-class PokeMap(ModelA, LogicalDeleteMixin):
-    """地图"""
-    # id = fields.IntField(pk=True, generated=True)
-    name = fields.CharField(max_length=32, default="", description="地图名", db_index=True)
-    width = fields.IntField()
-    height = fields.IntField()
-    _cells = fields.JSONField()
-    # deleted = fields.BooleanField(default=False, description="逻辑删除", db_index=True)
-    author = fields.CharField(null=True, max_length=32)
-    cells: list[list[Cell]]  # 格子
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        # self.cells = [[Cell("void")] * self.width for _ in range(self.height)]
-        self.make_void_cells()
-        # self.save_cell()
-
-    def make_void_cells(self):
-        """初始化为空格子"""
-        self.cells = [[CellEnum.void] * self.width for _ in range(self.height)]
-        # self._cells = json.dumps(self.cells, default=self.cell_serializer_ez)
-        self._cells = self.cells
-
-    def get_cells(self):
-        # print(f"type: {type(self._cells)}, {self._cells}")
-        return self._cells
-        # return json.loads(self._cells)
+    def make_pwd(self, pwd):
+        return sha256((pwd + self._salt).encode("utf-8")).hexdigest()
 
     @property
-    def scale(self):
-        """地图的总格子数"""
-        return self.width * self.height
+    def reset_password_salt(self):
+        return self._reset_password_salt
 
-    # @staticmethod
-    # def cell_serializer(o):
-    #     if isinstance(o, Cell):
-    #         return o.to_dict()
-    #     else:
-    #         return json.dumps(o)
+# class CellEnum(Enum):
+#     """格子类型"""
+#     void = 0
+#     grass = 1
+#     sea = 2
+#
+#
+# class CellState(Enum):
+#     """格子状态"""
+#     normal = 0
+#     burn = 1
+#     blocked = 2
+#
 
-    # @staticmethod
-    # def cell_serializer_ez(o):
-    #     return o.value
-    #
-    # def save_cell(self):
-    #     # print(f"{self._cells = }")
-    #     # print(f"{self.cells = }")
-    #     # self._cells = json.dumps(self.cells, default=self.cell_serializer)
-    #     self._cells = json.dumps(self.cells, default=self.cell_serializer_ez)
-    #
-    # def set_cell(self, value: str, x: int, y: int):
-    #     self.cells[x][y] = Cell(value)
-
-    # async def save(self, *args, **kwargs) -> None:
-    #     # self.save_cell()
-    #     await super().save(*args, **kwargs)
-
-
-if __name__ == '__main__':
-    # register_tortoise(app=app, config=setting1)
-    # import uvicorn
-    # uvicorn.run(app="orm1:app", port=8080, reload=True)
-    pass
+# class Cell(object):
+#     _type: CellEnum  # 类型
+#     state: CellState  # 状态
+#
+#     def __init__(self, _type: str):
+#         self._type = CellEnum[_type]
+#         self.state = CellState["normal"]
+#
+#     def __str__(self):
+#         # return f"Cell type:{self._type.name} state:{self.state}"
+#         return str(self.to_dict())
+#
+#     def __repr__(self):
+#         return self.__str__()
+#
+#     def to_dict(self):
+#         return {
+#             'type': self._type.name,
+#             'state': self.state.name
+#         }
+#
+#
+# class Area(ModelA, LogicalDeleteMixin):
+#     """区域"""
+#     # id = fields.IntField(pk=True, generated=True)
+#     name = fields.CharField(max_length=32, default="", description="区域名", db_index=True)
+#     father = fields.ForeignKeyField(model_name="models.Area", null=True, related_name="children")
+#     # deleted = fields.BooleanField(default=False, description="逻辑删除", db_index=True)
+#
+#
+# class PokeMap(ModelA, LogicalDeleteMixin):
+#     """地图"""
+#     # id = fields.IntField(pk=True, generated=True)
+#     name = fields.CharField(max_length=32, default="", description="地图名", db_index=True)
+#     width = fields.IntField()
+#     height = fields.IntField()
+#     _cells = fields.JSONField()
+#     # deleted = fields.BooleanField(default=False, description="逻辑删除", db_index=True)
+#     author = fields.CharField(null=True, max_length=32)
+#     cells: list[list[Cell]]  # 格子
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#         # self.cells = [[Cell("void")] * self.width for _ in range(self.height)]
+#         self.make_void_cells()
+#         # self.save_cell()
+#
+#     def make_void_cells(self):
+#         """初始化为空格子"""
+#         self.cells = [[CellEnum.void] * self.width for _ in range(self.height)]
+#         # self._cells = json.dumps(self.cells, default=self.cell_serializer_ez)
+#         self._cells = self.cells
+#
+#     def get_cells(self):
+#         # print(f"type: {type(self._cells)}, {self._cells}")
+#         return self._cells
+#         # return json.loads(self._cells)
+#
+#     @property
+#     def scale(self):
+#         """地图的总格子数"""
+#         return self.width * self.height

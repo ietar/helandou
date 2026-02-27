@@ -67,8 +67,6 @@ async def single_book(book_id: int):
     if not book1:
         return r404(msg="没有该书籍")
     author = book1.author
-    book1.read_count += 1
-    await book1.save()
     res = public_wrap_response(book1)
     res['data']['author'] = author.username
     return res
@@ -109,7 +107,7 @@ async def put_book(book_id: int, body: PutBookIn, token: dict = Depends(get_user
         exist = await Book.get_or_none(book_name=body.book_name)
         if exist:
             return r409(msg="已有同名书籍")
-        await book.update_from_dict(body.dict())
+        await book.update_from_dict(body.model_dump())
         await book.save()
         return public_wrap_response(msg="已成功修改书籍", model=book)
     else:

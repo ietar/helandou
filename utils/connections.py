@@ -17,9 +17,6 @@ async def get_redis_connection(db=0):
             db=db
         )
         r = redis.Redis(connection_pool=pool)
-        # print(f"{r = }")
-        # sig = await r.ping()
-        # print(sig)
         return r
     except ConnectionError:
         print("redis连接错误")
@@ -39,4 +36,3 @@ async def try_redis():
 
 if __name__ == '__main__':
     pass
-

@@ -2,7 +2,7 @@ div.blank{
     height: 3rem;
 }
 div.book_main {
-    margin: 0 10rem;
+    /*margin: 0 10rem;*/
     border: 2px solid #88C6E5;
 }
 dd.chapter{
@@ -34,7 +34,7 @@ div.content_footer>span{
     margin:0 3rem;
 }
 div.content_footer{
-    font-size: 1rem;
+    font-size: 1.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -70,6 +70,7 @@ div.content{
     font-size: 1.2rem;
     letter-spacing: 0.2rem;
     line-height: 150%;
+    white-space: pre-line;
 }
 textarea.input_comment{
     border: 1px solid #e0c19e;
@@ -90,4 +91,23 @@ div.comment{
 }
 span.comment_ts, span.agree_span, div.comment_user_name{
     font-size: 0.8rem;
+}
+
+/* 段落容器 */
+.paragraph-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+/* 段落评论按钮 */
+.paragraph-comment-btn {
+  background: #f0f0f0;
+  margin-left: 0.5rem;
+}
+
+/* 段落评论容器 */
+.paragraph_comment_wrapper {
+  border: 1px solid #eee;
+  background: #f8f8f8;
 }

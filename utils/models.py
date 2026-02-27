@@ -8,8 +8,8 @@ class ModelA(Model):
     包含自增id create_time和update_time
     """
     id = fields.IntField(primary_key=True)
-    create_time = fields.DatetimeField(auto_now_add=True)
-    update_time = fields.DatetimeField(auto_now=True)
+    create_time = fields.DatetimeField(auto_now_add=True, description="创建时间")
+    update_time = fields.DatetimeField(auto_now=True, description="更新时间")
 
     class Meta:
         abstract = True
@@ -25,7 +25,6 @@ class LogicalDeleteMixin(Model):
     async def delete(self, **kwargs):
         self.deleted = True
         await self.save(update_fields=["deleted"])
-        # await super().delete(**kwargs)
 
     class Meta:
         abstract = True

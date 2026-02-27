@@ -11,7 +11,7 @@ def subscribe_content_cost(content: str) -> Decimal:
     cost_rate = custom["subscribe_content_cost_rate"]  # 100
     decimal_places = custom["decimal_places"]  # 2
     subscribe_min_content = custom["subscribe_min_content"]  # 200
-    subscribe_min_cost = custom["subscribe_min_cost"]  # "0.01"
+    subscribe_min_cost = custom["subscribe_min_cost"]  # "1"
     length = len(content)
     if length < subscribe_min_content:
         return Decimal(subscribe_min_cost)

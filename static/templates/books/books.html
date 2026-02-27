@@ -25,8 +25,8 @@
                 </form>
             </div>
             <div class="user_info" id="user_info_bar" v-cloak>
-                <div v-if="username">
-                    <a class="username" href="/user/profile">[[ username ]]</a>
+                <div v-if="nickname">
+                    <a class="nickname" href="/user/profile">[[ nickname ]]</a>
                     <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
@@ -48,7 +48,6 @@
                         <span>作者： [[ book.author ]]</span>
                         <span>点击： [[ book.read_count ]]</span>
                         <span>收藏： [[ book.collect_count ]]</span>
-
                     </a>
                 </dd>
             </dl>
@@ -58,7 +57,7 @@
             <dl>
                 <dt>我的收藏夹:</dt>
                     <dd v-for = "col in collections" class="single_collection">
-                        <a :href="`/books/${col.book_id}/${col.chapter_order}`">《[[col.book_name]]》 第[[col.chapter_order]]章 [[col.chapter]]</a>
+                        <a :href="`/content/${col.content_id}`">《[[col.book_name]]》 [[col.chapter]]</a>
                         <a href="#" @click.prevent="delete_collection(col.content_id)">移出收藏夹</a>
             </dl>
         </div>

@@ -11,17 +11,14 @@ let vm = new Vue({
 
         error_img_code: true,
         error_password: true,
-
         error_img_message: '',
         show_success: false,
         success_message: '',
-
         error_login_message: '',
         error_login: false,
 
     },
     mounted(){
-//        this.csrf = $('input[name=csrfmiddlewaretoken]').val();
         this.generate_image_code();
     },
     methods: {
@@ -66,9 +63,7 @@ let vm = new Vue({
         },
         on_submit(e){
             this.check_img_code();
-
             if (this.error_password === true || this.error_img_code === true){
-                // window.event.returnValue = false;
                 e.preventDefault();
                 return;
             }
@@ -91,27 +86,23 @@ let vm = new Vue({
                     },
                     headers: {
                         'Content-Type':'application/json',
-                        // 'Content-Type':'application/x-www-form-urlencoded',
-                        // 'X-CSRFToken': window.sessionStorage.getItem("csrf_token")
-//                        'X-CSRFToken': this.csrf,
                     }})
                     .then(response => {
                         if (response.data.success === true) {
                             // 显示成功提示
+                            this.error_login = False;
+                            this.error_login_message = "";
                             this.show_success = true;
                             this.countdown = 3;  // 初始化倒计时
                             this.success_message = `注册成功，${this.countdown}秒后自动跳转至上页面...`;
                             // 更新倒计时显示
                             const timer = setInterval(() => {
                                 this.countdown -= 1;
-
                                 // 更新提示文本
                                 this.success_message = `注册成功，${this.countdown}秒后自动跳转至上页面...`;
                                 document.title = `(${this.countdown})登陆成功 - ${this.username}`
-
                                 if (this.countdown <= 0) {
                                     clearInterval(timer);
-//                                    let from = from ? decodeURIComponent(from).replace(/^\//, '') : null
                                     window.location.href = from;
                                 }
                             }, 1000);

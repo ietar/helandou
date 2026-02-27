@@ -4,7 +4,7 @@ from fastapi import APIRouter, Response, Body
 from utils.any import mk_chars, make_default_captcha
 from utils.response import wrap_response, r404
 from utils.connections import get_redis_connection
-from utils.sendmail import send_email_code_password
+from utils.sendmail import send_email_code_for_register
 from settings import custom
 
 verification_router = APIRouter()
@@ -49,5 +49,5 @@ async def post_email_code(uuid: str = Body(), email: str = Body()):
     ttl = custom.get("email_capcha_ttl_seconds", 120)
     await r.setex(name=f"email_code_{uuid}", time=ttl, value=chars)
 
-    send_email_code_password(to=email, code=chars)
+    send_email_code_for_register(to=email, code=chars)
     return wrap_response({"data": "已发送"})

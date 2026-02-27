@@ -17,7 +17,7 @@ let app = new Vue({
     el: '#user_info_bar',
     delimiters: ['[[', ']]'],
     data:{
-        username: '',
+        nickname: '',
     },
     mounted(){
         let path = encodeURIComponent(window.location.pathname);
@@ -25,13 +25,13 @@ let app = new Vue({
         document.getElementById('login').href = href;
         if (document.cookie != ''){
             let user = JSON.parse(window.atob(document.cookie.split(".")[1]))
-            this.username = user.username;
+            this.nickname = user.nickname;
         }
     },
     methods:{
         logout(){
             deleteCookie('Authorization');
-            this.username = '';
+            this.nickname = '';
             location.reload();
 //            window.location.href = '/';
         }

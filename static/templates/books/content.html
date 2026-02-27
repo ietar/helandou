@@ -25,8 +25,8 @@
                 </form>
             </div>
             <div class="user_info" id="user_info_bar" v-cloak>
-                <div v-if="username">
-                    <a class="username" href="/user/profile">[[ username ]]</a>
+                <div v-if="nickname">
+                    <a class="nickname" href="/user/profile">[[ nickname ]]</a>
                     <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
@@ -44,64 +44,110 @@
             <a href="/books/">书籍总览</a>
             <span class="arrow">--></span>
             <a :href=`/books/${book_id}`>《{{book_name}}》</a>
-            <span class="arrow">--></span><span>第{{ content.chapter_order}}章  {{content.chapter}}</span>
+            <span class="arrow">--></span><span>{{content.chapter}}</span>
         </div>
-        <div class="content_wrapper">
-            <div v-if="content" class="book_content_info">
-                <div class="book_name"><h1>《{{book_name}}》</h1></div>
-                <div class="chapter"><h2>第{{content.chapter_order}}章 {{content.chapter}}</h2></div>
-                <input v-model="content.chapter" v-show="editing">
-                <div class="read_count">点击: {{content.read_count}}</div>
-                <div class="collect_count">收藏: {{content.collect_count}}</div>
-                <input type="button" @click="edit_content" v-show="can_edit" value="修改章节内容">
-                <input type="button" @click="put_content" v-show="editing" value="提交修改">
-                <div v-show="need_subscribe">
-<!--                    <input type="button" @click="subscribe" id="subscribe" value="订阅该章节">-->
-                    <input type="button" @click="subscribe" id="subscribe" v-model="subscribe_text">
-                </div>
-            </div>
+        <div class="content">
+            <div class="content_wrapper">
+                <div v-if="content" class="book_content_info">
+                    <div class="book_name" style="margin-bottom:1rem"><h1>《{{book_name}}》</h1></div>
+                    <div class="chapter">
+                        <h2 style="cursor: pointer" @click="toggleParagraphComments(-1)">
+                            <span >{{content.chapter}}</span>
+                            <!-- 段落评论数按钮 -->
+                            <span class="paragraph-comment-btn" v-if="chapter_comments.length != 0">{{ chapter_comments?.length || 0 }}</span>
+                        </h2>
+                        <input v-model="content.chapter" v-show="editing" name="content.chapter">
+                    </div>
 
-            <div class="content" v-show="!editing">{{content.content}}</div>
-<!--            <textarea id="new_content" cols="30" rows="4" v-model="content.content"></textarea>-->
-            <textarea id="new_content" v-show="editing" v-model="content.content" style="width: 100%; height: 20rem;"></textarea>
-            <div v-if="!content">
-                <div>{{error_msg}}</div>
-            </div>
-
-            <div class="content_footer">
-                <a :href=`/books/${book_id}/${last_chapter_order}`>前一章</a>
-                <a :href=`/books/${book_id}`>回目录</a>
-                <a :href=`/books/${book_id}/${next_chapter_order}`>后一章</a>
-                <a href="#" @click.prevent=add_collections()>收藏 </a>
-            </div>
-        </div>
-
-        <div class="comment_wrapper">
-            <h3 class="comment_top">评论区</h3>
-            <div class="comments">
-                <div v-for="comment in comments">
-                    <div class="comment">
-                        <div class="comment_user_name">{{comment.user_name}}</div>
-                        <div class="comment_comment">{{comment.content}}</div>
-                        <span class="comment_ts">评论时间: {{comment.create_time}}</span>
-                        <span class="agree_span">
-                            <a href="#" class="agree" @click.prevent="agree(comment.id)">👍</a>
-                            <span class="comment_agree">{{comment.agree_count}}</span>
-                        </span>
-                        <span class="delete_span">
-                            <a href="#" class="error_tip" @click.prevent="delete_comment(comment.id)">❌</a>
-                        </span>
+                    <div>点击: {{content.read_count}}</div>
+                    <div>更新时间: {{formatTime(content.update_time)}}</div>
+                    <div name="hanging_comments_button">
+                        <h5 class="error_tip" v-if="hanging_comments.length != 0" style="cursor: pointer" @click="toggleParagraphComments(-2)">
+                            {{hanging_comments.length}}条评论未关联
+                        </h5>
+                    </div>
+                    <input type="button" @click="edit_content" v-show="can_edit" value="修改章节内容">
+                    <input type="button" @click="put_content" v-show="editing" value="提交修改">
+                    <div v-show="need_subscribe">
+    <!--                    <input type="button" @click="subscribe" id="subscribe" value="订阅该章节">-->
+                        <input type="button" @click="subscribe" id="subscribe" v-model="subscribe_text">
                     </div>
                 </div>
+                <div class="flex">
+                    <div class="container" style="height: auto;width:70%">
+                        <div style="width: 70%" class="flex">
+                            <div v-show="!editing" style="display: None" id="full_content">
+                                <template v-for="(paragraph, index) in content.content?.split('\n')" :key="index">
+                                    <div class="paragraph-wrapper" @click="toggleParagraphComments(index)">
+                                        <p>
+                                            <span class="paragraph-text">{{ paragraph }}</span>
+                                            <!-- 段落评论数按钮 -->
+                                            <span class="paragraph-comment-btn" v-if="getParagraphCommentCount(index)">{{ getParagraphCommentCount(index) }}</span>
+                                        </p>
+                                    </div>
+                                </template>
+                            </div>
+                            <div>
+                                <textarea id="new_full_content" v-show="editing" v-model="content.content" style="width: 100%; height: 20rem;"></textarea>
+                            </div>
+                            <div v-if="!content">
+                                <div>{{error_msg}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="paragraph_comment_wrapper" v-show="activeParagraphIndex !== null" style="width: 30%">
+                        <div v-if="activeParagraphIndex !== null">
+                            <p>共{{getParagraphCommentCount(activeParagraphIndex)}}条评论</p>
+                            <div v-for="comment in getParagraphComments(activeParagraphIndex)" :key="comment.id">
+                                <div class="paragraph_comment">
+                                    <a :href=`/user/profile/${comment.author.id}` style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <img :src=`${comment.author.avatar}` :alt=`${comment.author.nickname}的头像` style="width: 1.2rem; height: 1.2rem; object-fit: cover;">
+                                        <span class="comment_user_name">
+                                            {{comment.author.nickname}}
+                                        </span>
+                                    </a>
+                                    <div class="comment_comment">{{comment.content}}</div>
+                                    <span class="comment_ts">{{formatTime(comment.create_time)}}</span>
+                                    <span class="agree_span">
+                                        <a href="#" class="agree" @click.prevent="agree(comment.id)">👍</a>
+                                        <span class="comment_agree">{{comment.agree_count}}</span>
+                                    </span>
+                                    <span class="delete_span">
+                                        <a href="#" class="error_tip" @click.prevent="delete_comment(comment.id)">❌</a>
+                                    </span>
+                                    <p v-if="activeParagraphIndex == -2">
+                                        <span>原文为： {{formatDigest(comment.paragraph_digest)}}</span>
+                                        <input type="radio" id="to_rematch" @click="choose_one(comment.id)"> 捞我！ </input>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="add_comment" v-if="activeParagraphIndex != -2">
+                            <label>
+                                <textarea cols="30" rows="2" v-model="comment_to_send"></textarea>
+                            </label>
+                        </div>
+                        <a v-if="activeParagraphIndex >= 0" href="#" class="add_comment" @click.prevent="add_comment(activeParagraphIndex)">发表段评</a>
+                        <a v-if="activeParagraphIndex == -1" href="#" class="add_comment" @click.prevent="add_comment(-1)">发表章评</a>
+                        <div v-if="activeParagraphIndex == -2">
+                            <span>新家段落号：</span><input type="text" v-model="new_home">
+                            <a href="#" class="add_comment" @click.prevent="rematch(-2)">执行关联</a>
+                            <p>提示：可点击段落或标题进行关联</p>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+            <div class="content_footer">
+<!--                <a :href=`/books/${book_id}/${last_chapter_order}`>前一章</a>-->
+                <a :href=`/books/${book_id}`>回目录</a>
+<!--                <a :href=`/books/${book_id}/${next_chapter_order}`>后一章</a>-->
+                <a href="#" @click.prevent=add_collections()>收藏 </a>
             </div>
-            <div class="add_comment">
-                <label>
-                    <textarea id="input_comment" cols="30" rows="4" v-model="comment_to_send"></textarea>
-                </label>
             </div>
-            <a href="#" class="add_comment" @click.prevent="add_comment()">提交</a>
         </div>
-    </div>
+        </div>
+
 
     <div class="bei_an">
         <p>

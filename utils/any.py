@@ -6,7 +6,7 @@ import random
 
 from captcha.image import ImageCaptcha, random_color as rc
 
-from settings import setting1
+from settings import custom
 
 
 logger = logging.getLogger('fastapi')
@@ -77,7 +77,7 @@ def list_sub(list1: list, list2: list) -> list:
     return res
 
 
-def mk_chars(length=4, exceptions=setting1.get('CHAR_EXCEPTIONS') or 'ioszl10', lower_only=True,
+def mk_chars(length=4, exceptions=custom.get('CHAR_EXCEPTIONS') or 'ioszl10', lower_only=True,
              digit_more=False) -> str:
     """
     生成随机字母数字字符串 a-zA-Z0-9 排除exceptions字符的大小写 数字权重默认较低

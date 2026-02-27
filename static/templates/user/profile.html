@@ -24,8 +24,8 @@
                 </form>
             </div>
             <div class="user_info" id="user_info_bar" v-cloak>
-                <div v-if="username">
-                    <a class="username" href="/user/profile">[[ username ]]</a>
+                <div v-if="nickname">
+                    <a class="nickname" href="/user/profile">[[ nickname ]]</a>
                     <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
@@ -41,6 +41,11 @@
                 <div class="user_info">
                     <div><span>用户名: </span><span id="username">{{ username }} </span></div>
                     <div><span>代币: </span><span id="coins">{{ coins }}</span></div>
+                    <div>
+                        <span>昵称: </span>
+                        <input id="nickname" v-model="nickname" disabled>
+                        <span class="error_tip" v-show="nickname_msg" id="nickname_msg">{{ nickname_msg }}</span>
+                    </div>
                     <div><span>上次登录时间: </span><span id="last_login" >{{ last_login }} </span></div>
                     <div><span>上次登录ip: </span><span id="login_ip">{{ login_ip }} </span></div>
                     <div>
@@ -51,7 +56,7 @@
                     <div>
                         <span>邮箱: </span>
                         <input id="email" v-model="email" disabled>
-                        <span class="error_tip" v-show="mobile_msg" id="email_msg">{{ email_msg }}</span>
+                        <span class="error_tip" v-show="email_msg" id="email_msg">{{ email_msg }}</span>
                     </div>
                     <div>
                         <span>手机: </span>

@@ -15,11 +15,6 @@ def create_content():
     return FileResponse("static/templates/books/create_content.html")
 
 
-@books_pages_router.get("/{book_id}/{chapter_order}")
-def book_content(book_id: int, chapter_order: int):
-    return FileResponse("static/templates/books/content.html")
-
-
 @books_pages_router.get("/{book_id}")
 def single_book(book_id: int):
     return FileResponse("static/templates/books/book.html")

@@ -199,7 +199,8 @@ a{
 	height: 2rem;
 }
 .content{
-	display: inline-flex;
+	/*display: inline-flex;*/
+    flex-direction: column;
 }
 label{
     width:6rem;
@@ -554,4 +555,33 @@ div.go_to_read>a:hover{
 }
 div.go_to_read>a:active{
     text-decoration: none;
+}
+.flex{
+    display: flex
+}
+
+/* 消息框基本样式 */
+.flash-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px 30px;
+    border-radius: 5px;
+    color: white;
+    font-size: 18px;
+    text-align: center;
+    z-index: 999;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* 成功消息样式 */
+.flash-message.success {
+    background-color: #28a745;
+}
+
+/* 失败消息样式 */
+.flash-message.error {
+    background-color: #dc3545;
 }

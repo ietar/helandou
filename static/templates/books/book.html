@@ -26,8 +26,8 @@
                 </form>
             </div>
             <div class="user_info" id="user_info_bar" v-cloak>
-                <div v-if="username">
-                    <a class="username" href="/user/profile">[[ username ]]</a>
+                <div v-if="nickname">
+                    <a class="nickname" href="/user/profile">[[ nickname ]]</a>
                     <a id="logout" href="#" @click.prevent="logout">退出</a>
                 </div>
                 <div v-else>
@@ -49,8 +49,8 @@
                 <div class="digest">简介： {{book.digest}}</div>
                 <dl class="chapter_top">
                     <dt>《{{book.book_name}}》章节目录:</dt>
-                        <dd v-for="chapter in chapters" class="chapter"><a :href=`/books/${book.id}/${chapter.chapter_order}`>
-                            第{{chapter.chapter_order}}章 {{chapter.chapter}}
+                        <dd v-for="chapter in chapters" class="chapter"><a :href=`/content/${chapter.id}`>
+                            {{chapter.chapter}}
                         </a></dd>
                 </dl>
             </div>

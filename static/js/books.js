@@ -27,13 +27,12 @@ let ap_books = new Vue({
                     } else {
                         this.error = '数据加载失败：' + (res.data.msg || '未知错误')
                     }
-            }).catch(e => {console.log(e)})
+            }).catch(e => {flash_msg(e, false)})
         },
         delete_collection(content_id){
             axios.post('/api/content/add_to_collection', {"content_id": content_id}, {headers:{'Authorization': this.auth}, responseType: 'json'})
             .then(res => {
                 if (res.data.success){
-//                    window.location.reload();
                     this.get_my_collections();
                 }
             })
@@ -43,8 +42,7 @@ let ap_books = new Vue({
             .then(res => {
                 if (res.data.success) {
                     this.collections = res.data.data;
-//                    console.log(this.collections);
                 }
-            }).catch(e => {console.log(e)})
+            }).catch(e => {flash_msg(e, false)}})
         },
 }});

@@ -1,3 +1,5 @@
 0: 图片验证码 k-v  {img_code}_{uuid}: {captcha}
 1: 限流记录 k-v  {ip}__{path}: {last_access_time}  设定ttl
 2: 领币记录 k-v {from}__{user_id}: {ts} ttl=24h  from为领币途径 user_id为用户id ts为时间戳
+3：浏览章节记录 k-v {user_id}__{content_id}:1 ttl=24h
+4：浏览书籍记录 k-v {user_id}__{book_id}:1 ttl=24h
