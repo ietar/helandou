@@ -90,7 +90,7 @@ let vm = new Vue({
                     .then(response => {
                         if (response.data.success === true) {
                             // 显示成功提示
-                            this.error_login = False;
+                            this.error_login = false;
                             this.error_login_message = "";
                             this.show_success = true;
                             this.countdown = 3;  // 初始化倒计时
@@ -113,7 +113,7 @@ let vm = new Vue({
                         }
                     }).catch(e => {
                         this.error_login = true;
-                        this.error_login_message = e.response.data.msg;
+                        this.error_login_message = e.response?e.response.data.msg:e;
                         });
             }
         },

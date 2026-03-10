@@ -10,6 +10,9 @@ let ap_books = new Vue({
         chapter_comments: [],
         to_rematch: 0,  // 将被重新关联的评论id
         new_home: -1,  // 执行关联后的paragraph 默认扔给章评
+        parent_comment_id: null, // 被回复评论的id
+        reply_to_send: '', //回复评论的子评论的内容
+        expanding_comment: '', //展开子评论的评论id
 
         activeParagraphIndex: null, // 控制当前展开的段落评论
         paragraph_comments: [],
@@ -24,19 +27,9 @@ let ap_books = new Vue({
     mounted(){
         this.get_auth();
         this.get_content();
-        this.get_comments();
+//        this.get_comments();
     },
     methods:{
-        formatTime(timestamp) {
-            const date = new Date(timestamp);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        },
         get_auth(){
             const getAuthByRegex = () => {
                 const match = document.cookie.match(/Authorization=("?)(Bearer\s[\w-]+\.[\w-]+\.[\w-]+)\1/);
@@ -65,9 +58,11 @@ let ap_books = new Vue({
                         this.book_name = res.data.data['book_name'];
                         this.book_id = res.data.data['book_id'];
                         this.need_subscribe = res.data.data["need_subscribe"]
+                        if(!this.need_subscribe){this.get_comments();}
+
                         let cost = res.data.data["cost"];
                         this.subscribe_text = `消耗${cost}订阅该章节`;
-                        this.can_edit = res.data.data["can_edit"]
+                        this.can_edit = res.data.data["can_edit"];
                     } else {
                         this.error_msg = res.data.msg || '未知错误';
                     }
@@ -85,9 +80,10 @@ let ap_books = new Vue({
                     }
             }).catch(e => {flash_msg(e, false)})
         },
-        add_comment(paragraph){
+        add_comment(text, paragraph, parent_comment_id=null){
+            if(text.length == 0){flash_msg("评论内容为空",false);return;}
             axios.post(`/api/comment/create_comment/${this.chapter_id}`,
-             {"content": this.comment_to_send, "paragraph": paragraph}, {headers:{'Authorization': this.auth}, responseType: 'json'})
+             {"content": text, "paragraph": paragraph, "parent_comment_id":parent_comment_id}, {headers:{'Authorization': this.auth}, responseType: 'json'})
             .then(res => {
                 if (res.data.success){
                     console.log(res.data.msg);
@@ -156,8 +152,12 @@ let ap_books = new Vue({
         },
         // 获取段落评论数量
         getParagraphCommentCount(index) {
-            return this.getParagraphComments(index)?.length || 0;
-            return this.paragraph_comments[index]?.length || 0;
+            const parent_comments = this.getParagraphComments(index) || [];
+            let childrenCount = 0;
+            parent_comments.forEach(comment => {
+                childrenCount += comment.children?.length || 0;
+            });
+            return parent_comments.length + childrenCount;
         },
         // 获取指定段落的评论列表
         getParagraphComments(index) {

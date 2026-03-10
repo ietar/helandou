@@ -41,12 +41,31 @@
         <div class="where_am_i2">
             <a href="/">首页</a><span class="arrow">--></span><a href="/books/">书籍总览</a><span class="arrow">--></span><a :href=`/books/${book_id}`>《{{book.book_name}}》</a>
         </div>
-            <div v-if="book">
-                <div class="book_name"><h1>《{{book.book_name}}》</h1></div>
-                <div class="author">作者: {{book.author}}</div>
-                <div class="read_count">点击: {{book.read_count}}</div>
-                <div class="collect_count">收藏: {{book.collect_count}}</div>
-                <div class="digest">简介： {{book.digest}}</div>
+            <div class="flex_column" v-if="book">
+                <div style="display: flex;flex-direction: column;align-items: center;">
+                    <div style="margin:2rem">
+                    <a :href=`/books/${book.id}` class="book-link">
+                        <img class="book_cover_big" :src='book.cover' alt="封面">
+                    </a>
+                    </div>
+                    <div class="flex_column" style="display: flex; flex-direction: column; align-items: center;margin:1rem;">
+                        <div class="flex_row" style="margin:1rem">
+                            <a :href=`/books/${book.id}` class="book-link">
+                                <h1>{{ book.book_name }}</h1>
+                            </a>
+                        </div>
+                        <div class="flex_row">
+                            <a class="author" :href=`/user/profile/${book.author_id}`>
+                                {{ book.author_nickname }}
+                            </a> <span>&nbsp著</span>
+                        </div>
+                        <div>&nbsp</div>
+                        <div class="flex_row">简介：{{book.digest}}</div>
+                        <div class="flex_row">阅读数：{{ book.read_count }}</div>
+                        <div class="collect_count">收藏数: {{book.collect_count}}</div>
+                        <div class="flex_row">更新时间：{{ formatTime(book.update_time) }}</div>
+                    </div>
+                </div>
                 <dl class="chapter_top">
                     <dt>《{{book.book_name}}》章节目录:</dt>
                         <dd v-for="chapter in chapters" class="chapter"><a :href=`/content/${chapter.id}`>

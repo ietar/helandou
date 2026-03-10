@@ -14,14 +14,6 @@ dd.chapter{
     display: inline-block;
     border-bottom: 1px dashed #CCC;
 }
-dd.single_book{
-    margin: 2rem 1rem;
-    width: 30%;
-    font-size: 1.5rem;
-    text-align: left;
-    text-indent: 1rem;
-    display: inline-block;
-}
 div.book_name, div.chapter{
     text-align: center;
 }
@@ -60,17 +52,9 @@ dl.chapter_top>dt{
     background: #C3DFEA;
     font-size: 2rem;
 }
-div.books{
-    margin-top:2rem;
-}
+
 div.where_am_i{
     text-indent:1rem;
-}
-div.content{
-    font-size: 1.2rem;
-    letter-spacing: 0.2rem;
-    line-height: 150%;
-    white-space: pre-line;
 }
 textarea.input_comment{
     border: 1px solid #e0c19e;
@@ -89,7 +73,7 @@ div.comment{
     margin-top: 0.5rem;
     width:40%
 }
-span.comment_ts, span.agree_span, div.comment_user_name{
+span.comment_ts, span.agree_span, span.delete_span, div.comment_user_name{
     font-size: 0.8rem;
 }
 
@@ -110,4 +94,36 @@ span.comment_ts, span.agree_span, div.comment_user_name{
 .paragraph_comment_wrapper {
   border: 1px solid #eee;
   background: #f8f8f8;
+}
+
+button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease; /* 添加过渡动画 */
+}
+
+/* 取消按钮 */
+.cancel_btn {
+    background-color: #f0f0f0;
+    color: #666;
+}
+
+/* 回复按钮 */
+.reply_btn {
+    background-color: #1890ff;
+    color: white;
+}
+
+/* 悬停效果 */
+.reply_btn:hover {
+    background-color: #1473d6;    /* 颜色加深 */
+    transform: scale(1.02);       /* 轻微放大 */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* 添加投影 */
+}
+
+.reply_btn:active {
+    transform: scale(0.98);    /* 点击时凹陷效果 */
 }

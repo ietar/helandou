@@ -17,6 +17,7 @@ from user.user_pages import user_pages_router
 from books.book_api import books_api
 from books.content_api import content_api
 from books.comment_api import comment_api
+from books.tag_api import tags_api
 from books.books_pages import books_pages_router
 from books.content_pages import content_pages_router
 # from api.poke_maps import poke_maps_api
@@ -34,6 +35,7 @@ app.include_router(prefix="/api/user", router=user_api_router, tags=["user"])
 app.include_router(prefix="/api/books", router=books_api, tags=["book"])
 app.include_router(prefix="/api/content", router=content_api, tags=["content"])
 app.include_router(prefix="/api/comment", router=comment_api, tags=["comment"])
+app.include_router(prefix="/api/tags", router=tags_api, tags=["tags"])
 app.include_router(prefix="", router=verification_router, tags=["verifications"])
 # pages
 app.include_router(prefix="/user", router=user_pages_router, tags=["user_pages"])

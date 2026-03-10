@@ -14,6 +14,10 @@ def profile_page():
 def profile_page():
     return FileResponse("static/templates/user/profile.html")
 
+@user_pages_router.get("/profile/{user_id}")
+def profile_page(user_id: int):
+    return FileResponse("static/templates/user/profile.html")
+
 
 @user_pages_router.get("/register")
 def register_page():

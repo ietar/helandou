@@ -123,6 +123,8 @@ async def create_content(book_id: int, body: CreateContentIn, token: dict = Depe
     new_content = BookContent(**body.model_dump())
     new_content.book = book
     await new_content.save()
+    book.update_time = new_content.update_time
+    await book.save()
     return public_wrap_response(new_content, msg="创建章节成功")
 
 

@@ -40,26 +40,60 @@
         <div class="where_am_i2">
             <a href="/">首页</a><span class="arrow">--></span><a href="/books/">书籍总览</a>
         </div>
-        <div class="books">
-            <dl>
-                <dd v-for="book in books" class="single_book">
-                    <a :href=`/books/${book.id}/` class="book-link">
-                        <h4>《[[ book.book_name ]]》</h4>
-                        <span>作者： [[ book.author ]]</span>
-                        <span>点击： [[ book.read_count ]]</span>
-                        <span>收藏： [[ book.collect_count ]]</span>
-                    </a>
-                </dd>
-            </dl>
+        <div class="books flex_column" style="margin-top:2rem;padding-left:1rem">
+            <div class="flex_column">
+                <div class="flex" style="gap:2rem">
+                    <h3>按标签筛选:</h3>
+                    <div class="tag-group">
+                        <label v-for="tag in tags" :key="tag.id" class="radio-label">
+                            <input type="radio" name="book_tag" :value="tag.id" v-model="selected_tag_id" class="tag-radio">
+                            {{ tag.tag_name }}
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="book_tag" :value=null v-model="selected_tag_id" class="tag-radio">
+                            全部分类
+                        </label>
+                        <span style="margin:1rem">
+                        <button class="blue_button" @click.prevent="get_books(tag_id=selected_tag_id)">筛选</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex_row" style="flex-wrap: wrap">
+                <div class="flex single_book" v-for="book in books">
+                    <div style="margin-right:1rem">
+                        <a :href=`/books/${book.id}` class="book-link">
+                            <img class="book_cover" :src='book.cover' alt="封面">
+                        </a>
+                    </div>
+                    <div class="flex_column">
+                        <div class="flex_row">
+                            <a :href=`/books/${book.id}` class="book-link">
+                                <b>{{ book.book_name }}</b>
+                            </a>
+                        </div>
+                        <div class="flex_row">分类：{{book.tag_name}}</div>
+                        <div class="flex_row">简介：{{book.digest}}</div>
+                        <div class="flex_row">
+                            作者：
+                            <a class="author" :href=`/user/profile/${book.author_id}`>
+                                {{ book.author }}
+                            </a>
+                        </div>
+                        <div class="flex_row">阅读数：{{ book.read_count }}</div>
+                        <div class="flex_row">更新时间：{{ formatTime(book.update_time) }}</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="collections" id="collections">
-            <dl>
-                <dt>我的收藏夹:</dt>
-                    <dd v-for = "col in collections" class="single_collection">
-                        <a :href="`/content/${col.content_id}`">《[[col.book_name]]》 [[col.chapter]]</a>
-                        <a href="#" @click.prevent="delete_collection(col.content_id)">移出收藏夹</a>
-            </dl>
+            <div><h3>我的收藏夹:</h3></div>
+                <div v-for = "col in collections" class="single_collection">
+                    <a :href="`/content/${col.content_id}`"><b>《{{col.book_name}}》 {{col.chapter}}</b></a>
+                    <button class="red_button" @click.prevent="delete_collection(col.content_id)">移出收藏夹</button>
+                </div>
         </div>
         <div style="width: 6rem">
             <span style="margin: 0.5rem">

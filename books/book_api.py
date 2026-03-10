@@ -1,12 +1,16 @@
 # import json
+from typing import Optional
 from fastapi import APIRouter, Depends, Query
-from pydantic import BaseModel
-from models.models import User, Book, LevelEnum
+from pydantic import BaseModel, Field
+from models.models import User, Book, LevelEnum, Tag
 
 from utils.response import wrap_response, public_wrap_response, r401, r409, r404
 from auth import get_user_from_jwt, get_user_token
 
 books_api = APIRouter()
+
+
+
 
 
 @books_api.get("/my_books")
@@ -22,7 +26,7 @@ async def my_books(user=Depends(get_user_from_jwt)):
 async def search_books(q=Query()):
     books = await Book.filter(book_name__contains=q, deleted=False).select_related("author").values(
         "id", "book_name", "digest", "read_count",
-        "collect_count", "create_time", "update_time",
+        "collect_count", "create_time", "update_time", "cover",
         author_id="author__id",
         author="author__username"
     )
@@ -30,33 +34,39 @@ async def search_books(q=Query()):
 
 
 @books_api.get("/")
-async def all_books():
-    books = await Book.filter(deleted=False).select_related("author").order_by("-read_count").values(
+async def all_books(tag_id=Query(default=None)):
+    books = Book.filter(deleted=False).select_related("author", "tag")
+    if tag_id:
+        books = books.filter(tag_id=tag_id)
+
+    books = await books.order_by("-read_count").values(
         "id", "book_name", "digest", "read_count",
-        "collect_count", "create_time", "update_time",
+        "collect_count", "create_time", "update_time", "cover",
         author_id="author__id",
-        author="author__username"
+        author="author__nickname",
+        tag_name="tag__tag_name"
     )
     return wrap_response(books)
 
 
-class PutBookIn(BaseModel):
+class PostBookIn(BaseModel):
     book_name: str
     digest: str
-
+    tag_id: Optional[int] = None
 
 @books_api.post("/")
-async def create_book(body: PutBookIn, token: dict = Depends(get_user_token)):
-    if LevelEnum(token.get("level")) < LevelEnum.normal:
+async def create_book(body: PostBookIn, user=Depends(get_user_from_jwt)):
+    if LevelEnum(user.level) < LevelEnum.normal:
         return r401(msg="权限不足 只有通过认证的normal用户有权发表")
     book_name = body.book_name
     exist = await Book.get_or_none(book_name=book_name)
     if exist:
         return r409(msg="已有同名书籍")
-    user_id = token.get("id")
-    user = await User.get(id=user_id)
     new_book = Book(**body.model_dump())
     new_book.author = user
+    tag = await Tag.get_or_none(id=body.tag_id)
+    if tag:
+        new_book.tag = tag
     await new_book.save()
     return public_wrap_response(new_book, msg="创建书籍成功")
 
@@ -68,7 +78,7 @@ async def single_book(book_id: int):
         return r404(msg="没有该书籍")
     author = book1.author
     res = public_wrap_response(book1)
-    res['data']['author'] = author.username
+    res['data']['author_nickname'] = author.nickname
     return res
 
 
@@ -91,6 +101,11 @@ async def delete_book(book_id: int, token: dict = Depends(get_user_token)):
         return r401(msg="只有管理员或作者本人有权删除该书籍")
 
 
+class PutBookIn(BaseModel):
+    book_name: Optional[str] = None
+    digest: Optional[str] = None
+    tag_id: Optional[int] = None
+
 @books_api.put("/{book_id}")
 async def put_book(book_id: int, body: PutBookIn, token: dict = Depends(get_user_token)):
     """
@@ -107,7 +122,7 @@ async def put_book(book_id: int, body: PutBookIn, token: dict = Depends(get_user
         exist = await Book.get_or_none(book_name=body.book_name)
         if exist:
             return r409(msg="已有同名书籍")
-        await book.update_from_dict(body.model_dump())
+        await book.update_from_dict(body.model_dump(exclude_unset=True))
         await book.save()
         return public_wrap_response(msg="已成功修改书籍", model=book)
     else:

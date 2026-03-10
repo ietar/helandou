@@ -6,6 +6,13 @@ body{
 	margin:0;
 	padding:0;
 }
+a{
+    text-decoration: none; /* 默认下划线去除 */
+    color: #333;
+}
+a:hover {
+    color: #f28c50; /* 悬停颜色变化 */
+}
 .debug{
 	display: none;
 }
@@ -14,9 +21,6 @@ body{
 }
 ul li{
 	list-style: none;
-}
-a{
-	text-decoration: none;
 }
 .middle{
     text-align: center;
@@ -56,11 +60,6 @@ a{
 }
 .clickable{
 	cursor: pointer;
-}
-.button{
-	border:1px #d6877b solid;
-	background-color: silver;
-	margin:1rem;
 }
 .button_inline{
 	border:1px #d6877b solid;
@@ -198,9 +197,13 @@ a{
 .blank{
 	height: 2rem;
 }
-.content{
-	/*display: inline-flex;*/
-    flex-direction: column;
+
+div.content{
+    font-size: 1.2rem;
+    letter-spacing: 0.2rem;
+    line-height: 150%;
+    white-space: pre-line;
+
 }
 label{
     width:6rem;
@@ -584,4 +587,67 @@ div.go_to_read>a:active{
 /* 失败消息样式 */
 .flash-message.error {
     background-color: #dc3545;
+}
+
+.single_book{
+    margin: 2rem 1rem;
+    width: 30%;
+    font-size: 1.5rem;
+    text-align: left;
+    text-indent: 1rem;
+    display: flex;
+}
+
+img.book_cover{
+    width: 6rem;
+    height: 8rem;
+}
+
+img.book_cover_big{
+    width: 12rem;
+    height: 16rem;
+}
+
+div.books{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.reply{
+    cursor:pointer;
+    color: blue;
+}
+
+.reply:hover {
+    color: #f28c50; /* 悬停颜色变化 */
+}
+
+/* 蓝色确认按钮 */
+.blue_button {
+    background-color: #1890ff;
+    color: white;
+}
+
+/* 红色确认按钮 */
+.red_button {
+    background-color: red;
+    color: white;
+}
+
+/* 按钮悬停效果 */
+.blue_button:hover {
+    background-color: #1473d6;    /* 颜色加深 */
+    transform: scale(1.02);       /* 轻微放大 */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* 添加投影 */
+}
+
+.red_button:hover {
+    background-color: #bb0000;
+    transform: scale(1.02);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+button:active {
+    transform: scale(0.98);    /* 点击时凹陷效果 */
 }

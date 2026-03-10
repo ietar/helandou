@@ -6,11 +6,24 @@ let create_book = new Vue({
         auth: '',
         msg: '',
         error: '',
+        tags: [],
+        selected_tag_id: null,
     },
     mounted(){
         this.get_auth();
+        this.get_tags();
     },
     methods:{
+        get_tags(){
+            axios.get("/api/tags/").then(res => {
+                if (res.data.success){
+                    this.tags = res.data.data;
+//                    console.log(this.tags);
+                }else{
+                    this.error = `获取标签失败： ${res.data.msg}`
+                }
+            })
+        },
         get_auth(){
             const getAuthByRegex = () => {
                 const match = document.cookie.match(/Authorization=("?)(Bearer\s[\w-]+\.[\w-]+\.[\w-]+)\1/);
@@ -21,18 +34,14 @@ let create_book = new Vue({
         commit(){
             this.error = '';
             this.msg = '';
-            axios.post('/api/books/', {"book_name": this.book_name, "digest": this.digest}, {headers:{'Authorization': this.auth}, responseType: 'json'})
+            axios.post('/api/books/', {"book_name": this.book_name, "digest": this.digest, "tag_id": this.selected_tag_id}, {headers:{'Authorization': this.auth}, responseType: 'json'})
             .then(res => {
                 if (res.data.success) {
                         this.msg = res.data.msg;
                     } else {
-                        this.error = '数据加载失败：' + (res.data.msg || '未知错误')
+                        this.error = '创建书籍失败：' + (res.data.msg || '未知错误')
                     }
-            }).catch(e => {
-                this.error=e.response.data.msg;
-                console.log(this.error);
-//                alert(this.error);
-            })
+            }).catch(e => {flash_msg(e.response?e.response.data.msg:e,false);})
         },
 }});
 
@@ -66,7 +75,7 @@ let create_content = new Vue({
                 if (res.data.success) {
                     this.books = res.data.data;
                 }
-            }).catch(e => {console.log(e)})
+            }).catch(e => {flash_msg(e.response?e.response.data.msg:e,false);})
         },
         select_book(book_id){
             this.book_id = book_id;
@@ -79,14 +88,10 @@ let create_content = new Vue({
               {headers:{'Authorization': this.auth}, responseType: 'json'})
             .then(res => {
                 if (res.data.success) {
-                        this.msg = res.data.msg;
+                        flash_msg(res.data.msg);
                     } else {
-                        this.error = '数据加载失败：' + (res.data.msg || '未知错误')
+                        flash_msg(`提交失败：${res.data.msg || '未知错误'}` )
                     }
-            }).catch(e => {
-                this.error=e.response.data.msg;
-                console.log(this.error);
-//                alert(this.error);
-            })
+            }).catch(e => {flash_msg(e.response?e.response.data.msg:e,false);})
         },
 }});

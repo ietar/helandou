@@ -34,7 +34,8 @@ async def all_comment(chapter_id: int, page: int = 1, per_page: int = 200):
     #     Q(book_content=content) &
     #     ~Q(paragraph=-2)  # 排除悬挂区
     # ).select_related("author", "book_content")
-    base_query = Comment.filter(book_content=content).select_related("author", "book_content")
+    # 只取父评论 子评论后面单独追加
+    base_query = Comment.filter(book_content=content, parent_comment=None).select_related("author", "book_content")
 
     # 分页处理
     total = await base_query.count()

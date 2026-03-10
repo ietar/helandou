@@ -14,8 +14,6 @@
         <div class="container">
             <div class="where_am_i">
                 <a href="/">首页</a>
-                <span class="arrow">--></span>
-                <a href="/user/profile">用户中心</a>
             </div>
             <div class="search_bar" id="search_bar" v-cloak>
                 <form action="/search/" method="get">
@@ -36,17 +34,23 @@
         </div>
     </div>
     <div class="header_bottom">
+        <div class="where_am_i2">
+            <a href="/">首页</a>
+                <span class="arrow">--></span>
+                <a href="/user/profile">用户中心</a>
+        </div>
         <div class="content">
-            <div id="app" v-clock>
-                <div class="user_info">
+            <div id="app" v-clock v-show="id">
+                <div class="user_info" v-if="same_user">
                     <div><span>用户名: </span><span id="username">{{ username }} </span></div>
                     <div><span>代币: </span><span id="coins">{{ coins }}</span></div>
+                    <div><span>权限等级: </span><span id="level">{{ level }}</span></div>
                     <div>
                         <span>昵称: </span>
                         <input id="nickname" v-model="nickname" disabled>
                         <span class="error_tip" v-show="nickname_msg" id="nickname_msg">{{ nickname_msg }}</span>
                     </div>
-                    <div><span>上次登录时间: </span><span id="last_login" >{{ last_login }} </span></div>
+                    <div><span>上次登录时间: </span><span id="last_login" >{{ formatTime(last_login) }} </span></div>
                     <div><span>上次登录ip: </span><span id="login_ip">{{ login_ip }} </span></div>
                     <div>
                         <span>修改密码: </span>
@@ -66,19 +70,32 @@
                     <input type="button" @click="edit" value="修改">
                     <input type="button" @click="save" value="保存">
                 </div>
+                <div class="other_user_info" v-if="!same_user">
+                    <div><span>昵称: </span><span>{{ nickname }}</span></div>
+                    <div><span>代币: </span><span>{{ coins }}</span></div>
+                    <div><span>上次登录时间: </span><span >{{ formatTime(last_login) }} </span></div>
+                </div>
                 <div>
                     <span class="error_free_tip" v-show="msg">{{ msg }}</span>
                     <span class="error_tip" v-show="error_msg" id="error_msg">{{ error_msg }}</span>
                 </div>
+                <h2>该用户创建的书籍：</h2>
                 <div class="books">
-                    <h3>我创建的书籍：</h3>
-                    <dl>
-                        <dd v-for="book in books" class="single_book">
-                            <a :href=`/books/${book.id}/` class="book-link">
-                              《{{ book.book_name }}》
-                            </a>
-                        </dd>
-                    </dl>
+                        <div class="flex single_book" v-for="book in books">
+                            <div style="margin-right:1rem">
+                                <a :href=`/books/${book.id}/` class="book-link">
+                                    <img class="book_cover" :src='book.cover' alt="封面">
+                                </a>
+                            </div>
+                            <div class="flex_column">
+                                <div class="flex_row"></div>
+                                    <a :href=`/books/${book.id}` class="book-link">
+                                        <b>{{ book.book_name }}</b>
+                                    </a>
+                                <div class="flex_row">阅读数：{{ book.read_count }}</div>
+                                <div class="flex_row">更新时间：{{ formatTime(book.update_time) }}</div>
+                            </div>
+                        </div>
                 </div>
             </div>
         </div>

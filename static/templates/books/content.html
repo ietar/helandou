@@ -107,6 +107,7 @@
                                         </span>
                                     </a>
                                     <div class="comment_comment">{{comment.content}}</div>
+                                    <span class="reply" @click.prevent="parent_comment_id=comment.id;">回复</span>
                                     <span class="comment_ts">{{formatTime(comment.create_time)}}</span>
                                     <span class="agree_span">
                                         <a href="#" class="agree" @click.prevent="agree(comment.id)">👍</a>
@@ -115,6 +116,37 @@
                                     <span class="delete_span">
                                         <a href="#" class="error_tip" @click.prevent="delete_comment(comment.id)">❌</a>
                                     </span>
+
+                                    <div v-if="parent_comment_id == comment.id">
+                                        <textarea :placeholder=`回复${comment.author.nickname}:` v-model="reply_to_send"></textarea>
+                                        <button class="cancel_btn" @click="parent_comment_id=null">取消</button>
+                                        <button class="reply_btn" @click="add_comment(reply_to_send, comment.paragraph, parent_comment_id)">回复</button>
+                                    </div>
+                                    <div style="left:4rem; position:relative">
+                                        <a href="#" v-if="comment?.children?.length > 0" @click.prevent="expanding_comment=comment.id==expanding_comment?'':comment.id">展开{{comment.children.length}}条回复⬇️</a>
+                                    </div>
+
+                                    <div class="children_comments" v-if="expanding_comment == comment.id" style="left:4rem; position:relative">
+                                        <div v-for="child_comment in comment.children">
+                                            1
+                                            <a :href=`/user/profile/${child_comment.author.id}` style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                            <img :src=`${child_comment.author.avatar}` :alt=`${child_comment.author.nickname}的头像` style="width: 1.2rem; height: 1.2rem; object-fit: cover;">
+                                            <span class="comment_user_name">
+                                                {{child_comment.author.nickname}}
+                                            </span>
+                                            </a>
+                                            <div class="comment_comment">{{child_comment.content}}</div>
+                                            <span class="comment_ts">{{formatTime(child_comment.create_time)}}</span>
+                                            <span class="agree_span">
+                                                <a href="#" class="agree" @click.prevent="agree(child_comment.id)">👍</a>
+                                                <span class="comment_agree">{{child_comment.agree_count}}</span>
+                                            </span>
+                                            <span class="delete_span">
+                                                <a href="#" class="error_tip" @click.prevent="delete_comment(child_comment.id)">❌</a>
+                                            </span>
+                                        </div>
+                                    </div>
+
                                     <p v-if="activeParagraphIndex == -2">
                                         <span>原文为： {{formatDigest(comment.paragraph_digest)}}</span>
                                         <input type="radio" id="to_rematch" @click="choose_one(comment.id)"> 捞我！ </input>
@@ -127,8 +159,8 @@
                                 <textarea cols="30" rows="2" v-model="comment_to_send"></textarea>
                             </label>
                         </div>
-                        <a v-if="activeParagraphIndex >= 0" href="#" class="add_comment" @click.prevent="add_comment(activeParagraphIndex)">发表段评</a>
-                        <a v-if="activeParagraphIndex == -1" href="#" class="add_comment" @click.prevent="add_comment(-1)">发表章评</a>
+                        <a v-if="activeParagraphIndex >= 0" href="#" class="add_comment" @click.prevent="add_comment(comment_to_send,activeParagraphIndex)">发表段评</a>
+                        <a v-if="activeParagraphIndex == -1" href="#" class="add_comment" @click.prevent="add_comment(comment_to_send,-1)">发表章评</a>
                         <div v-if="activeParagraphIndex == -2">
                             <span>新家段落号：</span><input type="text" v-model="new_home">
                             <a href="#" class="add_comment" @click.prevent="rematch(-2)">执行关联</a>

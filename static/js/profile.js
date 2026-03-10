@@ -5,6 +5,7 @@ let ap_books = new Vue({
         username: '',
         coins:0,
         nickname: '',
+        level:'',
         nickname_msg: '',
         last_login: '',
         login_ip: '',
@@ -17,11 +18,11 @@ let ap_books = new Vue({
         former_password:'',
         new_password:'',
         books: [],
-
+        same_user: false,
     },
     mounted(){
         this.get_auth();
-        this.get_my_info();
+        this.get_user_info();
 //        this.get_comments()
     },
     methods:{
@@ -32,11 +33,17 @@ let ap_books = new Vue({
                 }
             this.auth = getAuthByRegex();
         },
-        get_my_info(){
+        get_user_info(){
             if (document.cookie != ''){
                 let user = JSON.parse(window.atob(document.cookie.split(".")[1]));
                 this.id = user.id;
-                axios.get(`/api/user/${this.id}`,{headers:{'Authorization': this.auth}, responseType: 'json'})
+
+                const url = window.location.href;
+                const lastSlashIndex = url.lastIndexOf('/');
+                let profile_id = Number(url.substring(lastSlashIndex + 1)) || this.id;
+                this.same_user = user.id == profile_id;
+
+                axios.get(`/api/user/${profile_id}`,{headers:{'Authorization': this.auth}, responseType: 'json'})
                     .then(res => {
                         if(res.data.success){
                             this.username = res.data.data.username;
@@ -58,7 +65,10 @@ let ap_books = new Vue({
                     })
             }
             else{
-                this.error_msg = "未登录";
+                flash_msg("未登录,3s后跳转登录页", false);
+                setTimeout(() => {
+                    window.location.href="/user/login";}, 3000);
+//                window.location="/user/login";
                 return
             }
         },

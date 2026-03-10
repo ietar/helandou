@@ -47,8 +47,17 @@
             <div style="margin:1rem">
                 <textarea id="input_comment" cols="30" rows="4" v-model="digest" placeholder="简介"></textarea>
             </div>
+            <div>
+                标签:
+                <div class="tag-group">
+                    <label v-for="tag in tags" :key="tag.id" class="radio-label">
+                        <input type="radio" name="book_tag" :value="tag.id" v-model="selected_tag_id" class="tag-radio">
+                        {{ tag.tag_name }}
+                    </label>
+                </div>
+            </div>
             <div style="margin:1rem">
-                <input type="submit" name="提交" @click.prevent="commit()">
+                <button class="blue_button" @click.prevent="commit()">提交</button>
             </div>
             <div style="margin:1rem">
                 <span v-show="msg" class="error_free_tip">{{ msg }}</span>

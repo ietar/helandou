@@ -102,8 +102,7 @@ async def user_exist(username: str):
 
 @user_api_router.get("/nothing")
 async def nothing(request: Request):  # test
-    print(request.cookies, request.client.host)
-    return wrap_response({})
+    return wrap_response({"cookies": request.cookies, "client": request.client.host})
 
 
 @user_api_router.get("/")
@@ -132,23 +131,24 @@ class RegisterUserIn(BaseModel):
         return v
 
 
-@user_api_router.post("/register_admin")
+@user_api_router.post("/register_root")
 async def register_admin(register_user: RegisterUserIn, response: Response):
     """
-    唯一管理员用户注册
+    唯一根用户注册
     """
-    find_user = await User.filter(level=LevelEnum.admin)
+    find_user = await User.filter(level=LevelEnum.root)
     if find_user:
         response.status_code = 409
-        return wrap_response(success=False, msg="管理员用户已存在")
+        return wrap_response(success=False, msg="根用户已存在")
 
     temp = register_user.model_dump()
     pwd = temp.pop("password")
     salt = mk_chars(length=6)
     temp["_password"] = sha256((pwd + salt).encode("utf-8")).hexdigest()
+    temp["nickname"] = f"用户{register_user.username}的昵称"
 
     new_user = User(**temp)
-    new_user.level = LevelEnum.admin
+    new_user.level = LevelEnum.root
     new_user._salt = salt
     await new_user.save()
     return public_wrap_response(new_user)
@@ -198,8 +198,8 @@ async def register(request: Request, register_user: RegisterUserIn, response: Re
 async def change_level(target_user_id: int = Body(), target_level: LevelEnum = Body(),
                        token: dict = Depends(get_user_token)):
     # print(target_user_id)
-    if LevelEnum(token.get("level")) < LevelEnum.admin:
-        return r401(msg="权限不足 只有admin用户有权更改用户等级")
+    if LevelEnum(token.get("level")) < LevelEnum.root:
+        return r401(msg="权限不足 只有root用户有权更改用户等级")
     user = await User.get(id=target_user_id)
     user.level = target_level
     await user.save()
@@ -286,9 +286,12 @@ async def single_user(user_id: int, user=Depends(get_user_from_jwt)):
         # 仅获取部分信息 username id level books
         data = {
             "username": query_user.username,
+            "nickname": query_user.nickname,
+            "coins": query_user.coins,
             "id": query_user.id,
             "level": query_user.level,
-            "books": [public_response(book) for book in books]
+            "books": [public_response(book) for book in books],
+            "last_login": query_user.last_login,
         }
         return wrap_response(data)
 

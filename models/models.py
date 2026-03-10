@@ -4,6 +4,13 @@ from tortoise import fields
 from utils.models import ModelA, LogicalDeleteMixin
 
 
+class Tag(ModelA):
+    """
+    书籍标签
+    """
+    tag_name = fields.CharField(max_length=32, unique=True, null=False)
+
+
 class Subscribe(ModelA):
     """
     订阅
@@ -22,6 +29,7 @@ class Book(ModelA, LogicalDeleteMixin):
     cover = fields.CharField(max_length=255,null=True,default="/static/img/cover_0.jpg", description="封面")
     read_count = fields.IntField(default=0, description="阅读次数")
     collect_count = fields.IntField(default=0, description="收藏数")
+    tag = fields.ForeignKeyField(model_name="models.Tag", related_name="books",null=True)
     # using = fields.BooleanField(default=False, description="是否写入中")
 
 
