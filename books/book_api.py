@@ -10,7 +10,18 @@ from auth import get_user_from_jwt, get_user_token
 books_api = APIRouter()
 
 
-
+# @books_api.get("/random_covers")
+# async def random_covers():
+#     """
+#     随机封面
+#     """
+#     books = await Book.filter(deleted=False)
+#     import random
+#     for book in books:
+#         # book.cover = random.choice(["/static/img/cover_0.jpg", "/static/img/cover_1.webp", "/static/img/cover_2.webp", "/static/img/cover_3.webp"])
+#         book.cover = random.choice(["/static/img/cover_1.webp", "/static/img/cover_2.webp", "/static/img/cover_3.webp", "/static/img/cover_4.webp"])
+#         await book.save()
+#     return public_wrap_response(books)
 
 
 @books_api.get("/my_books")
@@ -53,6 +64,7 @@ class PostBookIn(BaseModel):
     book_name: str
     digest: str
     tag_id: Optional[int] = None
+    cover: Optional[str] = None
 
 @books_api.post("/")
 async def create_book(body: PostBookIn, user=Depends(get_user_from_jwt)):
