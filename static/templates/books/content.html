@@ -75,7 +75,7 @@
                 </div>
                 <div class="flex">
                     <div class="container" style="height: auto;width:70%">
-                        <div style="width: 70%" class="flex">
+                        <div style="width: 70%">
                             <div v-show="!editing" style="display: None" id="full_content">
                                 <template v-for="(paragraph, index) in content.content?.split('\n')" :key="index">
                                     <div class="paragraph-wrapper" @click="toggleParagraphComments(index)">

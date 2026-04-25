@@ -82,6 +82,7 @@ span.comment_ts, span.agree_span, span.delete_span, div.comment_user_name{
   position: relative;
   margin-bottom: 1rem;
   cursor: pointer;
+  word-wrap:break-word;
 }
 
 /* 段落评论按钮 */
